@@ -1,0 +1,42 @@
+from transformers import LlamaTokenizer, AutoModelForCausalLM, AutoConfig, GenerationConfig
+import torch
+
+ckpt_path = '/data0/maqi/N_BELLE/BELLE/train/Version7/st5/'
+load_type = torch.float16
+device = torch.device(0)
+tokenizer = LlamaTokenizer.from_pretrained(ckpt_path)
+tokenizer.pad_token_id = 0
+tokenizer.bos_token_id = 1
+tokenizer.eos_token_id = 2
+tokenizer.padding_side = "left"
+model_config = AutoConfig.from_pretrained(ckpt_path)
+model = AutoModelForCausalLM.from_pretrained(ckpt_path, torch_dtype=load_type, config=model_config)
+model.to(device)
+model.eval()
+
+prompt = "Human: 请你抽取下面句子中的所有实体。记得上世纪50年代中期，我在完全中学读初中时，曾参加年级的一个大会，旨在交流学习经验，师生同登讲台。 \n\nAssistant: "
+inputs = tokenizer(prompt, return_tensors="pt")
+input_ids = inputs["input_ids"].to(device)
+generation_config = GenerationConfig(
+    temperature=0.1,
+    top_p=0.75,
+    top_k=40,
+    num_beams=1,
+    bos_token_id=1,
+    eos_token_id=2,
+    pad_token_id=0,
+    max_new_tokens=128,
+    min_new_tokens=10,
+    do_sample=True,
+)
+with torch.no_grad():
+    generation_output = model.generate(
+        input_ids=input_ids,
+        generation_config=generation_config,
+        return_dict_in_generate=True,
+        output_scores=True,
+        repetition_penalty=1.2,
+    )
+    output = generation_output.sequences[0]
+    output = tokenizer.decode(output, skip_special_tokens=True)
+    print(output)
