@@ -30,22 +30,26 @@ tokenizer = AutoTokenizer.from_pretrained(
 def process_data(data, scorer_, retrieval, max_word_count):
     out = []
     for row in tqdm(data):
-        sent_data = retrieval.get_sent_data(row["article"])
+        sent_data, word_count = retrieval.get_sent_data(row["article"])
         for question in row['questions']:
             query = question['question']
             options = question['options']
-            need_word_count = max_word_count - retrieval.get_token_num(query) - retrieval.get_token_num(
-                options[0]) - retrieval.get_token_num(
-                options[1]) - retrieval.get_token_num(options[2]) - retrieval.get_token_num(options[3])
-            shortened_article = retrieval.get_top_sentences(
-                query=query,
-                sent_data=sent_data,
-                opt_data=options,
-                max_word_count=need_word_count,
-                scorer_=scorer_,
-            )
+            if word_count >= max_word_count:
+                need_word_count = max_word_count - retrieval.get_token_num(query) - retrieval.get_token_num(
+                    options[0]) - retrieval.get_token_num(
+                    options[1]) - retrieval.get_token_num(options[2]) - retrieval.get_token_num(options[3])
+                shortened_article = retrieval.get_top_sentences(
+                    query=query,
+                    sent_data=sent_data,
+                    opt_data=options,
+                    max_word_count=need_word_count,
+                    scorer_=scorer_,
+                )
+                context = clean_string(shortened_article)
 
-            context = clean_string(shortened_article)
+            else:
+                context = clean_string(row["article"])
+
             query = clean_string(query)
             options = [clean_string(option) for option in options]
             out.append({

@@ -54,13 +54,16 @@ class Retrieval:
 
     def get_sent_data(self, raw_text):
         sent_data = []
+        word_count = 0
         for idx, sent_obj in enumerate(self.split_text_into_sentences(raw_text)):
+            token_num = self.get_token_num(sent_obj)
             sent_data.append({
                 "text": str(sent_obj).strip(),
-                "word_count": self.get_token_num(sent_obj),
+                "word_count": token_num,
                 "idx": idx
             })
-        return sent_data
+            word_count += token_num
+        return sent_data,word_count
 
     @staticmethod
     def get_top_sentences(query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
