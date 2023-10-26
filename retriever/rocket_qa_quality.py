@@ -27,7 +27,7 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 
 
-def process_data(data, scorer_, retrieval, max_word_count):
+def process_data(data, scorer_, retrieval, max_word_count, datasets_type='train'):
     out = []
     for row in tqdm(data):
         sent_data, word_count = retrieval.get_sent_data(row["article"])
@@ -59,20 +59,22 @@ def process_data(data, scorer_, retrieval, max_word_count):
                 "option_1": 'B.' + options[1],
                 "option_2": 'C.' + options[2],
                 "option_3": 'D.' + options[3],
-                "label": question["gold_label"]
+                "question_unique_id": question['question_unique_id'],
+                "label": question["gold_label"] if datasets_type != 'quality test' else None
             })
     lens = []
     for d in out:
         lens.append(retrieval.get_token_num(str(d)))
     # 平均
-    print(sum(lens) / len(lens))
+    print('dataset samples:', len(lens))
+    print('average tokens:', sum(lens) / len(lens))
 
     return out
 
 
-def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512):
+def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512, datasets_type='train'):
     data = read_jsonl(input_path_)
-    out = process_data(data, scorer_, retrieval, max_word_count_)
+    out = process_data(data, scorer_, retrieval, max_word_count_, datasets_type)
     write_jsonl(out, output_path_)
     print('save to ', output_path_)
 
@@ -81,11 +83,13 @@ if __name__ == '__main__':
     """
     nohup python -u rocket_qa_quality.py --type train --max_word_count 2048 --output_dir quality_rocketqa_2048 > logs/quality_train.log 2>&1 &
     nohup python -u rocket_qa_quality.py --type dev --max_word_count 2048 --output_dir quality_rocketqa_2048 >  logs/quality_dev.log 2>&1 &
+    nohup python -u rocket_qa_quality.py --type test --max_word_count 2048 --output_dir quality_rocketqa_2048 >  logs/quality_test.log 2>&1 &
     """
-    PHASES = ["train", "dev"]
+    # PHASES = ["train", "dev"]
 
+    PHASES = ['test']
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
-    parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
+    parser.add_argument("--type", type=str, required=False, default='test', choices=PHASES,
                         help="datasets")
     parser.add_argument("--max_word_count", type=int, required=False, default=2048,
                         help="max_word_count")
@@ -99,12 +103,14 @@ if __name__ == '__main__':
     input_base_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped'
     output_base_path = f'/data0/maqi/KGLQA-data/datasets/QuALITY/{args.output_dir}'
     query_type = 'question'
-    scorer = RocketScorer(model_name='v2_nq_de', batch_size=512)
+    scorer = RocketScorer(model_name='v2_nq_de', batch_size=64)
     Retriever = Retrieval(scorer=scorer, tokenizer=tokenizer)
 
     input_path = f"{input_base_path}.{phase}"
     output_path = os.path.join(output_base_path, f"{phase}.jsonl")
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
+
+    datasets_type = 'quality test' if phase == 'test' else 'train'
     process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retrieval=Retriever,
-                 max_word_count_=args.max_word_count - 100)
+                 max_word_count_=args.max_word_count - 100, datasets_type='quality test')
