@@ -160,7 +160,6 @@ if __name__ == '__main__':
     CAPTION_PROMPT_EN = 'You are very good at English ,please summarize this text in English:'
     LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
     DICT_TO_LABEL = {0: "A", 1: "B", 2: "C", 3: "D"}
-    # PHASES = ["train", "validation", "test"]
     PHASES = ["train", "dev", "test"]
     """
     nohup python -u get_caption_from_techgpt_quality.py --type train  --output_dir quality_caption_techgpt > train.log 2>&1 &

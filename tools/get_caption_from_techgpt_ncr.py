@@ -5,7 +5,7 @@ import re
 
 from tqdm import tqdm
 
-from techgpt_api import make_requests
+from tools.techgpt_api import make_requests_caption
 from utils.io_json import write_jsonl, read_jsonl
 
 
@@ -48,7 +48,7 @@ def process(dataset_type, save_path_):
     cur_lens = []
     phase = dataset_type
     raw_file = 'dev' if phase == 'validation' else phase
-    dataset = json.load(open(f'/data0/maqi/KGLTQA/datasets/NCR/ncr_raw/{raw_file}_2.json', 'r'))
+    dataset = json.load(open(f'/data0/maqi/KGLQA-data/datasets/NCR/ncr_raw/{raw_file}.json', 'r'))
     if os.path.exists(os.path.join(save_path_, f"{raw_file}.jsonl")):
         out_data = read_jsonl(os.path.join(save_path_, f"{raw_file}.jsonl"))
     else:
@@ -89,7 +89,7 @@ def process(dataset_type, save_path_):
                 # 尝试3次
                 for _ in range(3):
                     try:
-                        response = make_requests(request_data)
+                        response = make_requests_caption(request_data)
                         break
                     except Exception as e:
                         print(e, f'retry {_ + 1} times')
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     nohup python -u get_caption_from_techgpt_ncr.py --type test  --output_dir ncr_caption_techgpt > test.log 2>&1 &
     """
     parser = argparse.ArgumentParser(description="techgpt caption preprocessing")
-    parser.add_argument("--type", type=str, required=False, choices=PHASES,
+    parser.add_argument("--type", type=str, required=False, choices=PHASES, default='train',
                         help="datasets")
     parser.add_argument("--output_dir", type=str, required=False,
                         help="output_dir")
