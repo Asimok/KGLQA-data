@@ -9,9 +9,12 @@ from utils.formats import clean_string
 
 
 class Captions:
-    def __init__(self, tokenizer=None, language='en', max_seq_length=200):
+    def __init__(self,url, tokenizer=None, language='en', max_seq_length=200):
         self.tokenizer = tokenizer
-        self.url = "http://219.216.64.75:7035/get_captions"
+        # train 7035
+        # dev  7036
+        # test 7037
+        self.url = url
         self.max_seq_length = max_seq_length
         self.language = language
         self.split_token = '<question>:\n'

@@ -1,14 +1,32 @@
+import json
+
 from datasets import load_dataset
 from jsonlines import jsonlines
 from tqdm import tqdm
 
-raw_ds = load_dataset("race", "all")
+phase = 'middle'
+raw_ds = load_dataset("race", phase)
 train_ds = raw_ds["train"]
 dev_ds = raw_ds["validation"]
 test_ds = raw_ds["test"]
 
 
 # raw_ds.save_to_disk('/Users/maqi/PycharmProjects/KGLQA-data/datasets/race')
+def save_to_jsonl(data, dataset_type):
+    out_data = []
+    for i in tqdm(range(len(data))):
+        sample = data[i]
+        passage, answer, q, options = sample['article'], sample['answer'], sample['question'], sample['options']
+        out_data.append({
+            'passage': passage,
+            'answer': answer,
+            'question': q,
+            'options': options
+        })
+    with open('/Users/maqi/PycharmProjects/KGLQA-data/datasets/race/raw/' + dataset_type + '.jsonl', 'w') as w:
+        json.dump(out_data, w)
+    print('save to ', '/Users/maqi/PycharmProjects/KGLQA-data/datasets/race/raw/' + dataset_type + '.jsonl')
+
 
 def trans_dataset(data, dataset_type):
     out_data = []
@@ -38,6 +56,6 @@ def trans_dataset(data, dataset_type):
             w.write(line)
 
 
-trans_dataset(train_ds, 'all_train')
-trans_dataset(test_ds, 'all_test')
-trans_dataset(dev_ds, 'all_dev')
+save_to_jsonl(train_ds, f'{phase}_train')
+save_to_jsonl(test_ds, f'{phase}_test')
+save_to_jsonl(dev_ds, f'{phase}_dev')

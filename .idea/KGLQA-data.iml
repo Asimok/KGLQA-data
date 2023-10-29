@@ -2,7 +2,7 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Remote Python 3.9.12 (sftp://maqi@219.216.64.75:22/data0/maqi/.conda/envs/THUDM/bin/python3)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="THUDM-75-KGLQA-data" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

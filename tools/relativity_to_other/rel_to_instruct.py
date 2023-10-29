@@ -26,7 +26,7 @@ def get_token_num(text):
 
 LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
 DICT_TO_LABEL = {0: "A", 1: "B", 2: "C", 3: "D"}
-PHASES = ["train", 'dev']
+PHASES = ["test", 'dev']
 save_path = '/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_relativity_instruct_2'
 if not os.path.exists(save_path):
     os.makedirs(save_path)
@@ -110,21 +110,31 @@ for phase in PHASES:
                 need_tokens -= get_token_num(caption_)
             else:
                 break
-        # 剩下的token用all_caption填充
         less_len = need_tokens
-        for caption_id_, caption_ in all_caption.items():
-            if caption_selected.get(caption_id_, None) is None:
-                if less_len - get_token_num(caption_) >= 0:
-                    caption_selected[caption_id_] = caption_
-                    less_len -= get_token_num(caption_)
-                else:
-                    break
+
+        # # 剩下的token用all_caption填充
+        # less_len = need_tokens
+        # for caption_id_, caption_ in all_caption.items():
+        #     if caption_selected.get(caption_id_, None) is None:
+        #         if less_len - get_token_num(caption_) >= 0:
+        #             caption_selected[caption_id_] = caption_
+        #             less_len -= get_token_num(caption_)
+        #         else:
+        #             break
         # 剩下的token用all_passage填充
         for passage_id_, passage_ in all_passage.items():
             if passage_selected.get(passage_id_, None) is None:
                 if less_len - get_token_num(passage_) >= 0:
                     passage_selected[passage_id_] = passage_
                     less_len -= get_token_num(passage_)
+                else:
+                    break
+        # 剩下的token用all_caption填充
+        for caption_id_, caption_ in all_caption.items():
+            if caption_selected.get(caption_id_, None) is None:
+                if less_len - get_token_num(caption_) >= 0:
+                    caption_selected[caption_id_] = caption_
+                    less_len -= get_token_num(caption_)
                 else:
                     break
 

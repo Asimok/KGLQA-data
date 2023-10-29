@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 import argparse
 import os
-
+import math
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
@@ -22,27 +22,31 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_):
     out = []
-    for row in tqdm(data):
+    for row in tqdm(data, desc='process data'):
         sent_data, word_count = captions_.get_sent_data(row["article"])
         for question in row['questions']:
             query = question['question']
             options = question['options']
             # 分段
             # 分块数
-            chunk_num = 1900 / caption_max_seq_length_
+            max_chunk_num = math.ceil(1900 / caption_max_seq_length_)
+            # 平均每块大小
+            average_chunk_num = math.ceil(word_count / 400)
+            chunk_num = min(max_chunk_num, average_chunk_num)
             # 每块大小
-            chunk_size = word_count / chunk_num
-            # 每块大小
+            chunk_size = math.ceil(word_count / chunk_num)
             chunks = captions_.get_chunks(sent_data=sent_data, max_chunk_tokens=chunk_size)
             query = clean_string(query)
             options = [clean_string(option) for option in options]
             # get caption
             chunk_captions = []
             for idx, chunk in enumerate(chunks):
+                # 打印进度
+                print(f'process {idx}/{len(chunks)}', end='\r')
                 chunk_caption = captions_.get_caption(sent=chunk)
-                rel = relativity_.get_relativity(query=query, options=options, passage=chunk)
-                chunk_captions.append({'idx': idx, 'caption': chunk_caption, 'rel': rel})
-            print()
+                # rel = relativity_.get_relativity(query=query, options=options, passage=chunk)
+                # chunk_captions.append({'idx': idx, 'caption': chunk_caption, 'rel': rel})
+                chunk_captions.append(chunk_caption)
 
             out.append({
                 "captions_and_rel": chunk_captions,
@@ -73,12 +77,20 @@ if __name__ == '__main__':
     
     """
     PHASES = ["train", "dev", 'test']
+    # train 7035
+    # dev  7036
+    # test 7037
+    url_dict = {
+        'train': "http://219.216.64.231:7035/get_captions",
+        'dev': "http://219.216.64.231:7036/get_captions",
+        'test': "http://219.216.64.231:7037/get_captions",
+    }
 
     # PHASES = ['train']
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
     parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
                         help="datasets")
-    parser.add_argument("--output_dir", type=str, required=False, default='quality_rocketqa_2048',
+    parser.add_argument("--output_dir", type=str, required=False, default='quality_caption_and_rel',
                         help="output_dir")
 
     args = parser.parse_args()
@@ -93,8 +105,8 @@ if __name__ == '__main__':
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
 
-    caption_max_seq_length = 200
-    captions = Captions(tokenizer=tokenizer, language='en', max_seq_length=caption_max_seq_length)
+    caption_max_seq_length = 250
+    captions = Captions(url=url_dict[phase], tokenizer=tokenizer, language='en', max_seq_length=caption_max_seq_length)
     relativity = Relativity(language='en', max_seq_length=50)
     datasets_type = 'quality test' if phase == 'test' else phase
     process_file(input_path, output_path, captions_=captions, relativity_=relativity,
