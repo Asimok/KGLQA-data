@@ -3,7 +3,7 @@ from typing import List
 
 import requests
 
-from knowledage_bank.prompt import mark_relativity
+from knowledage_bank.core.prompt import mark_relativity
 
 
 class Relativity:

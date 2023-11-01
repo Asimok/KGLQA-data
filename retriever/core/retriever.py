@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 import rocketqa
 import torch
+from typing_extensions import override
 
 
 class RocketScorer:
@@ -23,18 +24,31 @@ class RocketScorer:
         return scores
 
 
-class Retrieval:
+class BaseRetrieval:
     def __init__(self, scorer=None, tokenizer=None):
         self.scorer = scorer
         self.tokenizer = tokenizer
 
     def get_token_num(self, text):
-        # return self.tokenizer(text, return_tensors="pt")["input_ids"].shape[1]
         token = self.tokenizer.encode(text=text, add_special_tokens=False)
         return len(token)
 
-    @staticmethod
-    def split_text_into_sentences(text):
+    def split_text_into_sentences(self, text):
+        pass
+
+    def get_sent_data(self, raw_text):
+        pass
+
+    def get_top_sentences(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
+                          scorer_: RocketScorer):
+        pass
+
+
+class Retrieval(BaseRetrieval):
+    def __init__(self, scorer=None, tokenizer=None):
+        super().__init__(scorer, tokenizer)
+
+    def split_text_into_sentences(self, text):
         # 使用正则表达式将文本按照句子分隔进行拆分
         sentences_ = re.split(r'[。！？；;\n]', text)
 
@@ -63,10 +77,10 @@ class Retrieval:
                 "idx": idx
             })
             word_count += token_num
-        return sent_data,word_count
+        return sent_data, word_count
 
-    @staticmethod
-    def get_top_sentences(query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
+    @override
+    def get_top_sentences(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
                           scorer_: RocketScorer):
         sentences = [sent['text'] for sent in sent_data]
         op_scores_idx = []
@@ -97,6 +111,7 @@ class Retrieval:
 
         total_word_count = 0
         chosen_sent_indices = set()
+        #  fix the sort
         for sent_idxs, score_ in sorted_scores:
             for sent_idx in sent_idxs:
                 if sent_idx in chosen_sent_indices:

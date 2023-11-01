@@ -5,7 +5,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import sys
 
 sys.path.append('/data0/maqi/KGLQA-data')
-from retriever import Retrieval, RocketScorer
+from retriever.core.retriever import Retrieval, RocketScorer
 
 import argparse
 

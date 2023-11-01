@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('/data0/maqi/KGLQA-data')
 import argparse
-from retriever import RocketScorer, Retrieval
+from retriever.core.retriever import RocketScorer, Retrieval
 
 import torch
 from tqdm import tqdm

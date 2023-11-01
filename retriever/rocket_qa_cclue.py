@@ -5,7 +5,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import sys
 
 sys.path.append('/data0/maqi/KGLQA-data')
-from retriever import Retrieval, RocketScorer
+from retriever.core.retriever import Retrieval, RocketScorer
 
 import argparse
 
@@ -40,7 +40,7 @@ def process_data(data, scorer_, retrieval, max_word_count):
                 options[1]) - retrieval.get_token_num(options[2]) - retrieval.get_token_num(options[3])
             shortened_article = retrieval.get_top_sentences(
                 query=query,
-                sent_data=sent_data,
+                context_data=sent_data,
                 opt_data=options,
                 max_word_count=need_word_count,
                 scorer_=scorer_,

@@ -1,12 +1,14 @@
 import math
 import sys
 
+import torch
+
 sys.path.append('../')
 import argparse
 import os
 
 from tqdm import tqdm
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, LlamaTokenizer
 
 from knowledage_bank.core.captions import Captions
 from knowledage_bank.core.relativity import Relativity
@@ -14,20 +16,22 @@ from utils.formats import clean_string
 from utils.io_json import read_jsonl, write_jsonl
 
 LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
-tokenizer = AutoTokenizer.from_pretrained(
-    '/data0/maqi/huggingface_models/llama-2-7b',
-    trust_remote_code=True,
-    # llama不支持fast
-    use_fast=False
-)
+ckpt_path = '/data0/maqi/N_BELLE/BELLE/train/Version7/st5/'
+load_type = torch.float16
+device = torch.device(0)
+tokenizer = LlamaTokenizer.from_pretrained(ckpt_path)
+tokenizer.pad_token_id = 0
+tokenizer.bos_token_id = 1
+tokenizer.eos_token_id = 2
+tokenizer.padding_side = "left"
 
 
 def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_):
     out = []
-    for row in tqdm(data[0], desc='process data'):
-        sent_data, word_count = captions_.get_sent_data(row["passage"])
-        query = row['question']
-        options = row['options']
+    for row in tqdm(data, desc='process data'):
+        sent_data, word_count = captions_.get_sent_data(row["context"])
+        query = row['query']
+        options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
         # 分段
         # 分块数
         max_chunk_num = math.ceil(1900 / caption_max_seq_length_)
@@ -57,7 +61,7 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
             "option_1": 'B.' + options[1],
             "option_2": 'C.' + options[2],
             "option_3": 'D.' + options[3],
-            "label": LABEL_TO_ID_DICT[row["answer"]] if datasets_type_ != 'quality test' else None
+            "label": row["label"] if datasets_type_ != 'quality test' else None
         })
     return out
 
@@ -71,10 +75,9 @@ def process_file(input_path_, output_path_, captions_, relativity_, caption_max_
 
 if __name__ == '__main__':
     """
-    nohup python -u race_process.py --dataset middle --type test  > logs/race_middle_test.log 2>&1 &
-    nohup python -u race_process.py --dataset middle --type dev  > logs/race_middle_dev.log 2>&1 &
-    nohup python -u race_process.py --dataset high --type test  > logs/race_high_test.log 2>&1 &
-    nohup python -u race_process.py --dataset high --type dev  > logs/race_high_dev.log 2>&1 &
+    
+    nohup python -u cclue_process.py  --type test  > logs/race_middle_test.log 2>&1 &
+    nohup python -u cclue_process.py  --type dev  > logs/race_middle_dev.log 2>&1 &
     
     
     """
@@ -82,31 +85,30 @@ if __name__ == '__main__':
     # dev  7036
     # test 7037
     url_dict = {
-        'dev': "http://219.216.64.231:7030/get_captions",
-        'test': "http://219.216.64.231:7030/get_captions",
+        'train': "http://219.216.64.231:7035/get_captions",
+        'dev': "http://219.216.64.231:7037/get_captions",
+        'test': "http://219.216.64.231:7036/get_captions",
     }
     PHASES = ["dev", 'test', 'train']
 
     # PHASES = ['train']
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
-    parser.add_argument("--dataset", type=str, required=False, default='middle', choices=['middle', 'high'],
-                        help="datasets")
     parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
                         help="datasets type")
 
     args = parser.parse_args()
 
     phase = args.type
-    print(phase, args.dataset)
-    input_path = f'/data0/maqi/KGLQA-data/datasets/RACE/raw/{args.dataset}_{args.type}.jsonl'
-    output_base_path = f'/data0/maqi/KGLQA-data/datasets/RACE/caption_and_rel'
+    print(phase)
+    input_path = f'/data0/maqi/KGLQA-data/datasets/CCLUE/cclue_normal/{args.type}.jsonl'
+    output_base_path = f'/data0/maqi/KGLQA-data/datasets/CCLUE/Caption'
 
-    output_path = os.path.join(output_base_path, f"{args.dataset}_{args.type}.jsonl")
+    output_path = os.path.join(output_base_path, f"{args.type}.jsonl")
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
 
     caption_max_seq_length = 250
-    captions = Captions(url=url_dict[phase], tokenizer=tokenizer, language='en', max_seq_length=caption_max_seq_length)
-    relativity = Relativity(language='en', max_seq_length=50)
+    captions = Captions(url=url_dict[phase], tokenizer=tokenizer, language='zh', max_seq_length=caption_max_seq_length)
+    relativity = Relativity(language='zh', max_seq_length=50)
     process_file(input_path, output_path, captions_=captions, relativity_=relativity,
-                 caption_max_seq_length_=caption_max_seq_length, datasets_type_='test')
+                 caption_max_seq_length_=caption_max_seq_length, datasets_type_='cclue')

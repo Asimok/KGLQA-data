@@ -7,8 +7,8 @@ import math
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
-from knowledage_bank.captions import Captions
-from knowledage_bank.relativity import Relativity
+from knowledage_bank.core.captions import Captions
+from knowledage_bank.core.relativity import Relativity
 from utils.formats import clean_string
 from utils.io_json import read_jsonl, write_jsonl
 
@@ -49,7 +49,7 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
                 chunk_captions.append(chunk_caption)
 
             out.append({
-                "captions_and_rel": chunk_captions,
+                "captions": chunk_captions,
                 "context": chunks,
                 "query": query,
                 "option_0": 'A.' + options[0],

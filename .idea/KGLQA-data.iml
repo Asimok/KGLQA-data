@@ -5,4 +5,12 @@
     <orderEntry type="jdk" jdkName="THUDM-75-KGLQA-data" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/retriever/core" />
+        <option value="$MODULE_DIR$/retriever" />
+      </list>
+    </option>
+  </component>
 </module>

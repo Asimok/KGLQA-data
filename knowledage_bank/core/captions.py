@@ -4,7 +4,7 @@ from typing import List
 
 import requests
 
-from knowledage_bank.prompt import get_caption_format
+from knowledage_bank.core.prompt import get_caption_format
 from utils.formats import clean_string
 
 
