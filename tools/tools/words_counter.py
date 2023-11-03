@@ -5,22 +5,22 @@ from tqdm import tqdm
 from transformers import LlamaTokenizer, AutoTokenizer
 import pandas as pd
 
-# ckpt_path = '/data0/maqi/N_BELLE/BELLE/train/Version7/st5/'
-# load_type = torch.float16
-# device = torch.device(0)
-# tokenizer = LlamaTokenizer.from_pretrained(ckpt_path)
-# tokenizer.pad_token_id = 0
-# tokenizer.bos_token_id = 1
-# tokenizer.eos_token_id = 2
-# tokenizer.padding_side = "left"
+ckpt_path = '/data0/maqi/N_BELLE/BELLE/train/Version7/st5/'
+load_type = torch.float16
+device = torch.device(0)
+tokenizer = LlamaTokenizer.from_pretrained(ckpt_path)
+tokenizer.pad_token_id = 0
+tokenizer.bos_token_id = 1
+tokenizer.eos_token_id = 2
+tokenizer.padding_side = "left"
 
 
-tokenizer = AutoTokenizer.from_pretrained(
-    '/data0/maqi/huggingface_models/llama-2-7b',
-    trust_remote_code=True,
-    # llama不支持fast
-    use_fast=False
-)
+# tokenizer = AutoTokenizer.from_pretrained(
+#     '/data0/maqi/huggingface_models/llama-2-7b',
+#     trust_remote_code=True,
+#     # llama不支持fast
+#     use_fast=False
+# )
 
 
 def get_token_num(text):
@@ -29,7 +29,7 @@ def get_token_num(text):
 
 
 if __name__ == '__main__':
-    train_path = "/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel_instruct/train.jsonl"
+    train_path = "/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel_new_instruct/dev.jsonl"
     # train_data = json.load(open(train_path, 'r'))
     train_data = []
     with open(train_path, 'r', encoding='utf-8') as f:

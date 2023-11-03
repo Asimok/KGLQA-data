@@ -58,13 +58,24 @@ class KnowledgeBank(BaseRetrieval):
             sorted_scores_context[key] = max(sorted_scores_context.get(key, 0), value)
         # 按value排序
         sorted_scores_merge = sorted(sorted_scores_context.items(), key=lambda x: x[1], reverse=True)
+        select_sorted_scores_merge= [sent_idx for sent_idx, score_ in sorted_scores_merge]
+        # TODO 如果 c_x 索引 在 t_x 之前，那么就删除 c_x
+        # select_sorted_scores_merge = set()
+        # for sent_idx, score_ in sorted_scores_merge:
+        #     if sent_idx.startswith('c_'):
+        #         if f't_{sent_idx[2:]}' in select_sorted_scores_merge:
+        #             continue
+        #     elif sent_idx.startswith('t_'):
+        #         if f'c_{sent_idx[2:]}' in select_sorted_scores_merge:
+        #             continue
+        #     select_sorted_scores_merge.add(sent_idx)
 
         # 组织上下文的逻辑
         # 排序从高到低
 
         total_word_count = 0
         chosen_sent_indices = set()
-        for sent_idx, score_ in sorted_scores_merge:
+        for sent_idx in select_sorted_scores_merge:
             if sent_idx in chosen_sent_indices:
                 continue
             if sent_idx.startswith('c_'):
@@ -75,11 +86,13 @@ class KnowledgeBank(BaseRetrieval):
                 total_word_count += sent_word_count
             if total_word_count > max_word_count:
                 break
-            chosen_sent_indices.add(sent_idx)
             if total_word_count > max_word_count:
                 break
+            chosen_sent_indices.add(sent_idx)
 
         chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        # 排序
+        chosen_sent_indices.sort(key=lambda x: int(x[2:]))
         captions = ''
         contexts = ''
         for sent_idx in chosen_sent_indices:

@@ -75,6 +75,7 @@ if __name__ == '__main__':
     nohup python -u race_process.py --dataset middle --type dev  > logs/race_middle_dev.log 2>&1 &
     nohup python -u race_process.py --dataset high --type test  > logs/race_high_test.log 2>&1 &
     nohup python -u race_process.py --dataset high --type dev  > logs/race_high_dev.log 2>&1 &
+    nohup python -u race_process.py --dataset all --type train  > logs/race_all_train.log 2>&1 &
     
     
     """
@@ -82,14 +83,14 @@ if __name__ == '__main__':
     # dev  7036
     # test 7037
     url_dict = {
-        'dev': "http://219.216.64.231:7030/get_captions",
-        'test': "http://219.216.64.231:7030/get_captions",
+        'train': "http://219.216.64.231:7035/get_captions",
+        'dev': "http://219.216.64.231:7036/get_captions",
     }
     PHASES = ["dev", 'test', 'train']
 
     # PHASES = ['train']
-    parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
-    parser.add_argument("--dataset", type=str, required=False, default='middle', choices=['middle', 'high'],
+    parser = argparse.ArgumentParser(description="race preprocessing")
+    parser.add_argument("--dataset", type=str, required=False, default='middle', choices=['middle', 'high','all'],
                         help="datasets")
     parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
                         help="datasets type")
