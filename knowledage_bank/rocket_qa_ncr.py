@@ -35,7 +35,7 @@ def process_data(data, scorer_, retriever, max_word_count):
         options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
 
         # 计算 context和caption的score
-        contexts, captions = retriever.get_top_sentences(query=query, context_data=context_data, captions_data=caption_data, opt_data=options, max_word_count=max_word_count, scorer_=scorer_)
+        contexts, captions = retriever.get_top_context(query=query, context_data=context_data, captions_data=caption_data, opt_data=options, max_word_count=max_word_count, scorer_=scorer_)
 
         query = clean_string(query)
         options = [clean_string(option) for option in options]

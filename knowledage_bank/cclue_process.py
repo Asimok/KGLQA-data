@@ -76,8 +76,9 @@ def process_file(input_path_, output_path_, captions_, relativity_, caption_max_
 if __name__ == '__main__':
     """
     
-    nohup python -u cclue_process.py  --type test  > logs/race_middle_test.log 2>&1 &
-    nohup python -u cclue_process.py  --type dev  > logs/race_middle_dev.log 2>&1 &
+    nohup python -u cclue_process.py  --type test  > logs/cclue_test.log 2>&1 &
+    nohup python -u cclue_process.py  --type dev  > logs/cclue_dev.log 2>&1 &
+    nohup python -u cclue_process.py  --type train > logs/cclue_train.log 2>&1 &
     
     
     """
@@ -85,7 +86,7 @@ if __name__ == '__main__':
     # dev  7036
     # test 7037
     url_dict = {
-        'train': "http://219.216.64.231:7035/get_captions",
+        'train': "http://219.216.64.231:7036/get_captions",
         'dev': "http://219.216.64.231:7037/get_captions",
         'test': "http://219.216.64.231:7036/get_captions",
     }
@@ -93,7 +94,7 @@ if __name__ == '__main__':
 
     # PHASES = ['train']
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
-    parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
+    parser.add_argument("--type", type=str, required=False, default='train', choices=PHASES,
                         help="datasets type")
 
     args = parser.parse_args()

@@ -8,22 +8,24 @@ from utils.io_json import write_jsonl
 
 LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
 DICT_TO_LABEL = {0: "A", 1: "B", 2: "C", 3: "D"}
-PHASES = ['dev','train','test']
-save_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel_instruct'
+PHASES = ['train', 'dev', 'test']
+save_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel_new_instruct'
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 lens = []
 for phase in PHASES:
     raw_file = 'dev' if phase == 'validation' else phase
     dataset = []
-    with open(f'/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel/{phase}.jsonl', 'r') as f:
+    input_file = f'/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_caption_and_rel_new/{phase}.jsonl'
+    # input_file = "/data0/maqi/KGLQA-data/datasets/RACE/race_caption_and_rel/all_train.jsonl"
+    with open(input_file, 'r') as f:
         for line in f:
             dataset.append(json.loads(line))
     out_data = []
     for idx, elem in enumerate(dataset):
         if elem['label'] is None:
             elem['label'] = 1
-        passage_entry, caption_entry, answer, query, options = elem["context"], elem["captions"], DICT_TO_LABEL[elem['label'] - 1], elem['query'], [
+        passage_entry, caption_entry, answer, query, options = elem["context"], elem["captions"], DICT_TO_LABEL[elem['label']-1], elem['query'], [
             elem["option_0"], elem["option_1"], elem["option_2"], elem["option_3"]]
         options = [option[4:] for option in options]
         # if len(passage_entry) < 10:

@@ -22,9 +22,9 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 
 
-def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_):
+def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_, output_path_):
     out = []
-    for row in tqdm(data[0], desc='process data'):
+    for t_idx, row in enumerate(tqdm(data[0], desc='process data')):
         sent_data, word_count = captions_.get_sent_data(row["passage"])
         query = row['question']
         options = row['options']
@@ -32,7 +32,7 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
         # 分块数
         max_chunk_num = math.ceil(1900 / caption_max_seq_length_)
         # 平均每块大小
-        average_chunk_num = math.ceil(word_count / 400)
+        average_chunk_num = math.ceil(word_count / 530)
         chunk_num = min(max_chunk_num, average_chunk_num)
         # 每块大小
         chunk_size = math.ceil(word_count / chunk_num)
@@ -59,12 +59,16 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
             "option_3": 'D.' + options[3],
             "label": LABEL_TO_ID_DICT[row["answer"]] if datasets_type_ != 'quality test' else None
         })
+        if t_idx % 10 == 0:
+            print(f'current idx: {t_idx}/{len(data[0])}')
+            print('save to ', output_path_)
+            write_jsonl(out, output_path_)
     return out
 
 
 def process_file(input_path_, output_path_, captions_, relativity_, caption_max_seq_length_, datasets_type_):
     data = read_jsonl(input_path_)
-    out = process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_)
+    out = process_data(data, captions_, relativity_, caption_max_seq_length_, datasets_type_, output_path_)
     write_jsonl(out, output_path_)
     print('save to ', output_path_)
 
@@ -75,9 +79,8 @@ if __name__ == '__main__':
     nohup python -u race_process.py --dataset middle --type dev  > logs/race_middle_dev.log 2>&1 &
     nohup python -u race_process.py --dataset high --type test  > logs/race_high_test.log 2>&1 &
     nohup python -u race_process.py --dataset high --type dev  > logs/race_high_dev.log 2>&1 &
-    nohup python -u race_process.py --dataset all --type train  > logs/race_all_train.log 2>&1 &
-    
-    
+    nohup python -u race_process.py --dataset all --type train  > logs/race_all_train.log 2>&1 &   
+     
     """
     # train 7035
     # dev  7036
@@ -90,9 +93,9 @@ if __name__ == '__main__':
 
     # PHASES = ['train']
     parser = argparse.ArgumentParser(description="race preprocessing")
-    parser.add_argument("--dataset", type=str, required=False, default='middle', choices=['middle', 'high','all'],
+    parser.add_argument("--dataset", type=str, required=False, default='all', choices=['middle', 'high', 'all'],
                         help="datasets")
-    parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,
+    parser.add_argument("--type", type=str, required=False, default='train', choices=PHASES,
                         help="datasets type")
 
     args = parser.parse_args()

@@ -36,7 +36,7 @@ def process_data(data, scorer_, retriever, max_word_count):
                 need_word_count = max_word_count - retriever.get_token_num(query) - retriever.get_token_num(
                     options[0]) - retriever.get_token_num(
                     options[1]) - retriever.get_token_num(options[2]) - retriever.get_token_num(options[3])
-                shortened_article = retriever.get_top_sentences(
+                shortened_article = retriever.get_top_context(
                     query=query,
                     sent_data=sent_data,
                     opt_data=options,
