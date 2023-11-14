@@ -1,10 +1,9 @@
 import os
 import sys
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 sys.path.append('/data0/maqi/KGLQA-data')
 from knowledage_bank.core.knowledge_bank import KnowledgeBank
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import argparse
 from retriever.core.retriever import RocketScorer
@@ -66,9 +65,9 @@ def process_file(input_path_, output_path_, scorer_, retriever, max_word_count=5
 
 if __name__ == '__main__':
     """
-    nohup python -u rocket_qa_ncr.py --type train --max_word_count 2048 --output_dir ncr_caption_and_rel > logs/ncr_train.log 2>&1 &
-    nohup python -u rocket_qa_ncr.py --type dev --max_word_count 2048 --output_dir ncr_caption_and_rel > logs/ncr_dev.log 2>&1 &
-    nohup python -u rocket_qa_ncr.py --type test --max_word_count 2048 --output_dir ncr_caption_and_rel > logs/ncr_test.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type train --max_word_count 2048 --output_dir ncr_caption_and_rel_new > logs/ncr_train.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type dev --max_word_count 2048 --output_dir ncr_caption_and_rel_new > logs/ncr_dev.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 2048 --output_dir ncr_caption_and_rel_new > logs/ncr_test.log 2>&1 &
     """
     PHASES = ["train", "dev", "test"]
 

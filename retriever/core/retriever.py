@@ -34,6 +34,24 @@ class BaseRetrieval:
         return len(token)
 
     def split_text_into_sentences(self, text):
+        pass
+
+    def get_sent_data(self, raw_text):
+        pass
+
+    def get_top_sentences(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
+                          scorer_: RocketScorer):
+        pass
+
+    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
+        pass
+
+
+class Retrieval(BaseRetrieval):
+    def __init__(self, scorer=None, tokenizer=None):
+        super().__init__(scorer, tokenizer)
+
+    def split_text_into_sentences(self, text):
         # 使用正则表达式将文本按照句子分隔进行拆分
         sentences_ = re.split(r'[。！？；;\n]', text)
 
@@ -50,31 +68,6 @@ class BaseRetrieval:
                 merged_sentences.append(sentences_[i])
 
         return merged_sentences
-
-    def get_sent_data(self, raw_text):
-        sent_data = []
-        word_count = 0
-        for idx, sent_obj in enumerate(self.split_text_into_sentences(raw_text)):
-            token_num = self.get_token_num(sent_obj)
-            sent_data.append({
-                "text": str(sent_obj).strip(),
-                "word_count": token_num,
-                "idx": idx
-            })
-            word_count += token_num
-        return sent_data, word_count
-
-    def get_top_sentences(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
-                          scorer_: RocketScorer):
-        pass
-
-    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
-        pass
-
-
-class Retrieval(BaseRetrieval):
-    def __init__(self, scorer=None, tokenizer=None):
-        super().__init__(scorer, tokenizer)
 
     def get_sent_data(self, raw_text):
         sent_data = []

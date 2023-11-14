@@ -87,9 +87,9 @@ class KnowledgeBank(BaseRetrieval):
         for idx, score_ in sorted_scores:
             if isinstance(idx, tuple):
                 for sent_idx in idx:
-                    max_score_dict[f't_{sent_idx}'] = max(max_score_dict[sent_idx], score_)
+                    max_score_dict[f't_{sent_idx}'] = max(max_score_dict[f't_{sent_idx}'], score_)
             else:
-                max_score_dict[idx] = max(max_score_dict[idx], score_)
+                max_score_dict[f't_{idx}'] = max(max_score_dict[idx], score_)
 
         return max_score_dict
 
