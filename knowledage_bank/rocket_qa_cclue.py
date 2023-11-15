@@ -1,10 +1,10 @@
 import os
 import sys
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 sys.path.append('/data0/maqi/KGLQA-data')
 from knowledage_bank.core.knowledge_bank import KnowledgeBank
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import argparse
 from retriever.core.retriever import RocketScorer
@@ -30,7 +30,7 @@ def process_data(data, scorer_, retriever, max_word_count):
     out = []
     for row in tqdm(data):
         context_data, context_word_count = retriever.get_sent_data(row["context"])
-        caption_data, caption_word_count = retriever.get_sent_data(row["captions_and_rel"])
+        caption_data, caption_word_count = retriever.get_sent_data(row["captions"])
         query = row['query']
         options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
 
@@ -68,8 +68,9 @@ if __name__ == '__main__':
     """
     nohup python -u rocket_qa_cclue.py --type dev --max_word_count 2048 --output_dir cclue_caption_and_rel > logs/cclue_dev.log 2>&1 &
     nohup python -u rocket_qa_cclue.py --type test --max_word_count 2048 --output_dir cclue_caption_and_rel > logs/cclue_test.log 2>&1 &
+    nohup python -u rocket_qa_cclue.py --type train --max_word_count 2048 --output_dir cclue_caption_and_rel > logs/cclue_train.log 2>&1 &
     """
-    PHASES = ["dev", "test"]
+    PHASES = ['train', "dev", "test"]
 
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
     parser.add_argument("--type", type=str, required=False, default='dev', choices=PHASES,

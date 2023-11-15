@@ -29,7 +29,7 @@ def get_token_num(text):
 
 
 if __name__ == '__main__':
-    train_path = "/data0/maqi/KGLQA-data/datasets/RACE/raw/all_train.jsonl"
+    train_path = "/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel_new_instruct/train.jsonl"
     # train_data = json.load(open(train_path, 'r'))
     train_data = []
     with open(train_path, 'r', encoding='utf-8') as f:

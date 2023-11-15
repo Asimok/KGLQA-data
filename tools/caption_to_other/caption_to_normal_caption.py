@@ -28,8 +28,8 @@ for phase in PHASES:
         captions_and_rel = []
         context = []
         for caption_idx, caption in enumerate(elem['caption_data']):
-            captions_and_rel.append(' '.join(caption['text']))
-            context.append(caption['caption'])
+            context.append('.'.join(caption['text']))
+            captions_and_rel.append(caption['caption'])
 
         out_data.append({
             "captions": captions_and_rel,
