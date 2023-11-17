@@ -29,14 +29,14 @@ def get_token_num(text):
 
 
 if __name__ == '__main__':
-    train_path = "/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel_new_instruct/train.jsonl"
+    train_path = "/data0/maqi/KGLQA-data/datasets/RACE/raw/all_train.jsonl"
     # train_data = json.load(open(train_path, 'r'))
     train_data = []
     with open(train_path, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             train_data.append(json.loads(line))
     word_count = []
-    for row in tqdm(train_data):
+    for row in tqdm(train_data[0]):
         word_count.append(get_token_num(str(row)))
     print(sum(word_count) / len(word_count))
     print(pd.Series(word_count).describe(percentiles=[0.5, 0.75, 0.9, 0.95, 0.99]))

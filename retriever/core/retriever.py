@@ -129,6 +129,8 @@ class Retrieval(BaseRetrieval):
                 break
 
         chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        # 排序
+        chosen_sent_indices.sort()
         shortened_article = " ".join(sent_data[sent_idx]["text"] for sent_idx in chosen_sent_indices)
         return shortened_article
 

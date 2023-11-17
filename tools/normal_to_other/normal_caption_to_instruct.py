@@ -43,8 +43,8 @@ for phase in PHASES:
         else:
             prefix = (
                 '阅读以下段落、摘要和问题，然后从选项中选择正确答案，答案应为A、B、C、D中的一个。\n\n')
-            passage = f'<段落>:\n{passage_entry}\n\n'
-            caption = f'<摘要>:\n{caption_entry}\n\n'
+            passage = f'<段落>:\n{caption_entry}\n\n'
+            caption = f'<摘要>:\n{passage_entry}\n\n'
             question = f'<问题>:\n{query}\n\n'
             option = f'<选项>:\nA {options[0]}\nB {options[1]}\nC {options[2]}\nD {options[3]}\n\n'
             suffix = f"<答案>:\n"
