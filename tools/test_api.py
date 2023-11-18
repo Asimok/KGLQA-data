@@ -14,7 +14,7 @@ model = AutoModelForCausalLM.from_pretrained(ckpt_path, torch_dtype=load_type, c
 model.to(device)
 model.eval()
 
-prompt = "Human: 请你抽取下面句子中的所有实体。记得上世纪50年代中期，我在完全中学读初中时，曾参加年级的一个大会，旨在交流学习经验，师生同登讲台。 \n\nAssistant: "
+prompt = "Human: 你是谁 \n\nAssistant: "
 inputs = tokenizer(prompt, return_tensors="pt")
 input_ids = inputs["input_ids"].to(device)
 generation_config = GenerationConfig(
