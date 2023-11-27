@@ -13,7 +13,7 @@ from option_3.utils import clean_str, gen_file_name
 from utils.io_json import write_jsonl
 
 
-def read_ncr(data_path_='/data0/maqi/KGLQA-data/datasets/NCR/ncr_format/test.jsonl'):
+def read_ncr(data_path_):
     dataset_ = []
     with open(data_path_, 'r') as f:
         for line in f:
@@ -27,7 +27,7 @@ def process(dataset_):
     for elem in tqdm(dataset_):
         passage = elem['article']
         passage = passage.strip()
-        kb, file_name = gen_file_name(kb, passage,split_num=40)
+        kb, file_name = gen_file_name(kb, passage, split_num=100, repeat=False, max_len=200)
         elem['file_name'] = file_name
         process_dataset_.append(elem)
     return process_dataset_
@@ -48,8 +48,8 @@ def save_data(dataset_, save_path_, phase_):
 if __name__ == '__main__':
     PHASES = ['train', 'dev', 'test']
     for phase in PHASES:
-        data_path = f'/data0/maqi/KGLQA-data/datasets/NCR/ncr_format/{phase}.jsonl'
-        save_path = '/data0/maqi/KGLQA-data/datasets/NCR/LangChain/knowledge_base'
+        data_path = f'/data0/maqi/KGLQA-data/datasets/QuALITY/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped.{phase}'
+        save_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/LangChain/knowledge_base'
         dataset = read_ncr(data_path)
         dataset = process(dataset)
         save_data(dataset, save_path, phase)
