@@ -30,7 +30,7 @@ def process_data(data, scorer_, retriever, max_word_count):
     out = []
     for row in tqdm(data):
         context_data, context_word_count = retriever.get_sent_data(row["context"])
-        caption_data, caption_word_count = retriever.get_sent_data(row["captions"])
+        caption_data, caption_word_count = retriever.get_sent_data(row["captions_and_rel"])
         query = row['query']
         options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
 

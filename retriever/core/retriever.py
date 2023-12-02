@@ -46,6 +46,67 @@ class BaseRetrieval:
     def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
         pass
 
+    def get_top_sentences_mark(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
+                             scorer_: RocketScorer):
+        """
+        返回原文，并标识已选句子
+        """
+        sentences = [sent['text'] for sent in sent_data]
+        op_scores_idx = []
+        # 计算  sent_idx    sent_idx-1+sent_idx   sent_idx+sent_idx+1   sent_idx-1+sent_idx+sent_idx+1 与 option的score
+        for opt in opt_data:
+            temp_cal_pair = []
+            for sent_idx, sent in enumerate(sentences):
+                if sent_idx != len(sentences) - 1:
+                    temp_cal_pair.append(((sent_idx, sent_idx + 1), sentences[sent_idx] + sentences[sent_idx + 1]))
+                if sent_idx != 0:
+                    temp_cal_pair.append(((sent_idx - 1, sent_idx), sentences[sent_idx - 1] + sentences[sent_idx]))
+                if sent_idx != 0 and sent_idx != len(sentences) - 1:
+                    temp_cal_pair.append(((sent_idx - 1, sent_idx, sent_idx + 1),
+                                          sentences[sent_idx - 1] + sentences[sent_idx] + sentences[sent_idx + 1]))
+                temp_cal_pair.append(((sent_idx,), sentences[sent_idx]))
+            score = scorer_.score(opt, [pair[1] for pair in temp_cal_pair])
+            for idx, pair in enumerate(temp_cal_pair):
+                op_scores_idx.append((pair[0], score[idx]))
+        # 计算question 与 sentence 的score
+        qp_scores_idx = [(sent_idx, score) for sent_idx, score in enumerate(scorer_.score(query, sentences))]
+
+        sorted_scores = OrderedDict()
+        for idx, score_ in op_scores_idx:
+            sorted_scores[idx] = score_
+        for idx, score_ in qp_scores_idx:
+            sorted_scores[(idx,)] = score_
+        sorted_scores = sorted(sorted_scores.items(), key=lambda x: x[1], reverse=True)
+
+        total_word_count = 0
+        chosen_sent_indices = set()
+        #  fix the sort
+        for sent_idxs, score_ in sorted_scores:
+            for sent_idx in sent_idxs:
+                if sent_idx in chosen_sent_indices:
+                    continue
+                sent_word_count = sent_data[sent_idx]["word_count"]
+                if sent_idx not in chosen_sent_indices:
+                    total_word_count += sent_word_count
+                if total_word_count > max_word_count:
+                    break
+                chosen_sent_indices.add(sent_idx)
+            if total_word_count > max_word_count:
+                break
+
+        chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        # 排序
+        chosen_sent_indices.sort()
+        # shortened_article = " ".join(sent_data[sent_idx]["text"] for sent_idx in chosen_sent_indices)
+        raw_context = [sent_idx["text"] for sent_idx in sent_data]
+        return raw_context, chosen_sent_indices
+    def get_top_context_mark(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int):
+        """
+        返回原文 并标识已选句子
+        """
+        pass
+
+
 
 class Retrieval(BaseRetrieval):
     def __init__(self, scorer=None, tokenizer=None):
