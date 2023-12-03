@@ -6,7 +6,7 @@ from jsonlines import jsonlines
 # dataset_race_train = '/data0/maqi/KGLQA-data/datasets/RACE/race_train.jsonl'
 # dataset_race_dev = '/data0/maqi/KGLQA-data/datasets/race/race_dev.jsonl'
 
-dataset_quality = '/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel_new_instruct//train.jsonl'
+dataset_quality = '/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel_new_instruct/train.jsonl'
 dataset_race_train = '/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption_and_rel_instruct/train.jsonl'
 # dataset_race_dev = '/data0/maqi/KGLQA-data/datasets/CCLUE_processed/cclue_firefly/dev.jsonl'
 # dataset_race_test = '/data0/maqi/KGLQA-data/datasets/CCLUE_processed/cclue_firefly/test.jsonl'

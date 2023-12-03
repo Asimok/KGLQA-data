@@ -1,3 +1,4 @@
+import random
 import re
 from collections import OrderedDict
 
@@ -47,7 +48,7 @@ class BaseRetrieval:
         pass
 
     def get_top_sentences_mark(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
-                             scorer_: RocketScorer):
+                               scorer_: RocketScorer):
         """
         返回原文，并标识已选句子
         """
@@ -100,12 +101,29 @@ class BaseRetrieval:
         # shortened_article = " ".join(sent_data[sent_idx]["text"] for sent_idx in chosen_sent_indices)
         raw_context = [sent_idx["text"] for sent_idx in sent_data]
         return raw_context, chosen_sent_indices
+
     def get_top_context_mark(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int):
         """
         返回原文 并标识已选句子
         """
         pass
 
+    def random_select(self, sent_data: list[dict], max_word_count: int):
+        """
+        随机选择句子
+        """
+        sentences = [sent['text'] for sent in sent_data]
+        chosen_sent_indices = set()
+        total_word_count = 0
+        while total_word_count < max_word_count:
+            sent_idx = random.randint(0, len(sentences) - 1)
+            if sent_idx not in chosen_sent_indices:
+                total_word_count += sent_data[sent_idx]["word_count"]
+                chosen_sent_indices.add(sent_idx)
+        chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        chosen_sent_indices.sort()
+        raw_context = [sent_idx["text"] for sent_idx in sent_data]
+        return raw_context, chosen_sent_indices
 
 
 class Retrieval(BaseRetrieval):
