@@ -43,8 +43,8 @@ def process_data(data, scorer_, retriever, max_word_count):
                 #     max_word_count=need_word_count,
                 #     scorer_=scorer_,
                 # )
-                # TODO random select
-                raw_context, chosen_sent_indices = retriever.random_select(sent_data=sent_data, max_word_count=max_word_count)
+                # random select
+                raw_context, chosen_sent_indices = retriever.random_select(sent_data=sent_data, max_word_count=need_word_count)
                 shortened_article = ''.join(raw_context)
                 context = clean_string(shortened_article)
             else:
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     phase = args.type
     print(phase, args.max_word_count, args.output_dir)
     input_base_path = '/data0/maqi/KGLQA-data/datasets/NCR/ncr_format'
-    output_base_path = f'/data0/maqi/KGLQA-data/datasets/NCR/{args.output_dir}'
+    output_base_path = f'/data0/maqi/KGLQA-data/datasets/NCR/random_select/{args.output_dir}'
     query_type = 'question'
     scorer = RocketScorer(model_name='zh_dureader_de', batch_size=512)
     Retriever = Retrieval(scorer=scorer, tokenizer=tokenizer)
