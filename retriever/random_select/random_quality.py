@@ -27,7 +27,7 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 
 
-def process_data(data, scorer_, retrieval, max_word_count, datasets_type_='train'):
+def process_data(data, scorer_, retrieval, max_word_count, datasets_type_='train', chunk=False):
     out = []
     for row in tqdm(data):
         sent_data, word_count = retrieval.get_sent_data(row["article"])
@@ -38,8 +38,13 @@ def process_data(data, scorer_, retrieval, max_word_count, datasets_type_='train
                 need_word_count = max_word_count - retrieval.get_token_num(query) - retrieval.get_token_num(
                     options[0]) - retrieval.get_token_num(
                     options[1]) - retrieval.get_token_num(options[2]) - retrieval.get_token_num(options[3])
-                # random select
-                raw_context, chosen_sent_indices = retrieval.random_select(sent_data=sent_data, max_word_count=need_word_count)
+                if chunk:
+                    # chunk select
+                    raw_context, chosen_sent_indices = retrieval.chunk(sent_data=sent_data,
+                                                                       max_word_count=need_word_count)
+                else:
+                    # random select
+                    raw_context, chosen_sent_indices = retrieval.random_select(sent_data=sent_data, max_word_count=need_word_count)
                 shortened_article = ''.join(raw_context)
                 context = clean_string(shortened_article)
 
@@ -58,19 +63,19 @@ def process_data(data, scorer_, retrieval, max_word_count, datasets_type_='train
                 "question_unique_id": question['question_unique_id'],
                 "label": question["gold_label"] if datasets_type_ != 'quality test' else None
             })
-    lens = []
-    for d in out:
-        lens.append(retrieval.get_token_num(str(d)))
-    # 平均
-    print('dataset samples:', len(lens))
-    print('average tokens:', sum(lens) / len(lens))
+    # lens = []
+    # for d in out:
+    #     lens.append(retrieval.get_token_num(str(d)))
+    # # 平均
+    # print('dataset samples:', len(lens))
+    # print('average tokens:', sum(lens) / len(lens))
 
     return out
 
 
-def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512, datasets_type='train'):
+def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512, datasets_type='train', chunk=False):
     data = read_jsonl(input_path_)
-    out = process_data(data, scorer_, retrieval, max_word_count_, datasets_type)
+    out = process_data(data, scorer_, retrieval, max_word_count_, datasets_type, chunk)
     write_jsonl(out, output_path_)
     print('save to ', output_path_)
 
@@ -80,6 +85,10 @@ if __name__ == '__main__':
     nohup python -u random_quality.py --type train --max_word_count 2048 --output_dir quality_random_2048 > logs/quality_train.log 2>&1 &
     nohup python -u random_quality.py --type dev --max_word_count 2048 --output_dir quality_random_2048 >  logs/quality_dev.log 2>&1 &
     nohup python -u random_quality.py --type test --max_word_count 2048 --output_dir quality_random_2048 >  logs/quality_test.log 2>&1 &
+    
+    nohup python -u random_quality.py --type train --max_word_count 2048 --output_dir quality_chunk_2048 > logs/quality_train.log 2>&1 &
+    nohup python -u random_quality.py --type dev --max_word_count 2048 --output_dir quality_chunk_2048 >  logs/quality_dev.log 2>&1 &
+    nohup python -u random_quality.py --type test --max_word_count 2048 --output_dir quality_chunk_2048 >  logs/quality_test.log 2>&1 &
     """
     PHASES = ["train", "dev", 'test']
 
@@ -108,4 +117,4 @@ if __name__ == '__main__':
 
     datasets_type = 'quality test' if phase == 'test' else 'train'
     process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retrieval=Retriever,
-                 max_word_count_=args.max_word_count - 100, datasets_type='quality test')
+                 max_word_count_=args.max_word_count - 100, datasets_type=datasets_type, chunk=True)

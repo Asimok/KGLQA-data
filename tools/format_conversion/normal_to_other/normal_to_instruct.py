@@ -9,19 +9,19 @@ from utils.io_json import write_jsonl
 LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
 DICT_TO_LABEL = {0: "A", 1: "B", 2: "C", 3: "D"}
 PHASES = ["dev", "train", 'test']
-save_path = '/data0/maqi/KGLQA-data/datasets/CCLUE/random_select/cclue_random_1400_instruct'
+save_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/random_select/quality_random_2048_instruct'
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 lens = []
 for phase in PHASES:
     raw_file = 'dev' if phase == 'validation' else phase
     dataset = []
-    with open(f'/data0/maqi/KGLQA-data/datasets/CCLUE/random_select/cclue_random_1400/{phase}.jsonl', 'r') as f:
+    with open(f'/data0/maqi/KGLQA-data/datasets/QuALITY/random_select/quality_random_2048/{phase}.jsonl', 'r') as f:
         for line in f:
             dataset.append(json.loads(line))
     out_data = []
     for idx, elem in enumerate(dataset):
-        passage, answer, q, options = elem["context"], DICT_TO_LABEL[elem['label']], elem['query'], [
+        passage, answer, q, options = elem["context"], DICT_TO_LABEL[elem['label'] - 1], elem['query'], [
             elem["option_0"], elem["option_1"], elem["option_2"], elem["option_3"]]
         options = [option[4:] for option in options]
         if len(passage) < 10:

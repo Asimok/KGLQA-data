@@ -27,7 +27,7 @@ tokenizer = AutoTokenizer.from_pretrained(
 )
 
 
-def process_data(data, scorer_, retrieval, max_word_count):
+def process_data(data, scorer_, retrieval, max_word_count, chunk=False):
     out = []
     for row in tqdm(data):
         sent_data, word_count = retrieval.get_sent_data(row["context"])
@@ -38,8 +38,11 @@ def process_data(data, scorer_, retrieval, max_word_count):
             need_word_count = max_word_count - retrieval.get_token_num(query) - retrieval.get_token_num(
                 options[0]) - retrieval.get_token_num(
                 options[1]) - retrieval.get_token_num(options[2]) - retrieval.get_token_num(options[3])
-            # random select
-            raw_context, chosen_sent_indices = retrieval.random_select(sent_data=sent_data, max_word_count=need_word_count)
+            if chunk:
+                raw_context, chosen_sent_indices = retrieval.chunk(sent_data=sent_data, max_word_count=need_word_count)
+            else:
+                # random select
+                raw_context, chosen_sent_indices = retrieval.random_select(sent_data=sent_data, max_word_count=need_word_count)
             shortened_article = ''.join(raw_context)
             context = clean_string(shortened_article)
 
@@ -66,9 +69,9 @@ def process_data(data, scorer_, retrieval, max_word_count):
     return out
 
 
-def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512):
+def process_file(input_path_, output_path_, scorer_, retrieval, max_word_count_=512, chunk=False):
     data = read_jsonl(input_path_)
-    out = process_data(data, scorer_, retrieval, max_word_count_)
+    out = process_data(data, scorer_, retrieval, max_word_count_, chunk)
     write_jsonl(out, output_path_)
     print('save to ', output_path_)
 
@@ -78,6 +81,10 @@ if __name__ == '__main__':
     nohup python -u random_cclue.py --type train --max_word_count 1400 --output_dir cclue_random_1400 > logs/cclue_train.log 2>&1 &
     nohup python -u random_cclue.py --type dev --max_word_count 1400 --output_dir cclue_random_1400 >  logs/cclue_dev.log 2>&1 &
     nohup python -u random_cclue.py --type test --max_word_count 1400 --output_dir cclue_random_1400 >  logs/cclue_test.log 2>&1 &
+    
+    nohup python -u random_cclue.py --type train --max_word_count 1400 --output_dir cclue_chunk_1400 > logs/cclue_train.log 2>&1 &
+    nohup python -u random_cclue.py --type dev --max_word_count 1400 --output_dir cclue_chunk_1400 >  logs/cclue_dev.log 2>&1 &
+    nohup python -u random_cclue.py --type test --max_word_count 1400 --output_dir cclue_chunk_1400 >  logs/cclue_test.log 2>&1 &
     """
     PHASES = ["train", "dev", "test"]
 
@@ -104,4 +111,4 @@ if __name__ == '__main__':
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
     process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retrieval=Retriever,
-                 max_word_count_=args.max_word_count - 100)
+                 max_word_count_=args.max_word_count - 100, chunk=True)

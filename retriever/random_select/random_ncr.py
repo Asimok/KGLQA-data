@@ -24,7 +24,7 @@ tokenizer.eos_token_id = 2
 tokenizer.padding_side = "left"
 
 
-def process_data(data, scorer_, retriever, max_word_count):
+def process_data(data, scorer_, retriever, max_word_count, chunk=False):
     out = []
     for row in tqdm(data):
         sent_data, word_count = retriever.get_sent_data(row["article"])
@@ -36,15 +36,11 @@ def process_data(data, scorer_, retriever, max_word_count):
                 need_word_count = max_word_count - retriever.get_token_num(query) - retriever.get_token_num(
                     options[0]) - retriever.get_token_num(
                     options[1]) - retriever.get_token_num(options[2]) - retriever.get_token_num(options[3])
-                # shortened_article = retriever.get_top_sentences(
-                #     query=query,
-                #     sent_data=sent_data,
-                #     opt_data=options,
-                #     max_word_count=need_word_count,
-                #     scorer_=scorer_,
-                # )
-                # random select
-                raw_context, chosen_sent_indices = retriever.random_select(sent_data=sent_data, max_word_count=need_word_count)
+                if chunk:
+                    raw_context, chosen_sent_indices = retriever.chunk(sent_data=sent_data, max_word_count=need_word_count)
+                else:
+                    # random select
+                    raw_context, chosen_sent_indices = retriever.random_select(sent_data=sent_data, max_word_count=need_word_count)
                 shortened_article = ''.join(raw_context)
                 context = clean_string(shortened_article)
             else:
@@ -69,9 +65,9 @@ def process_data(data, scorer_, retriever, max_word_count):
     return out
 
 
-def process_file(input_path_, output_path_, scorer_, retriever, max_word_count=512):
+def process_file(input_path_, output_path_, scorer_, retriever, max_word_count=512, chunk=False):
     data = read_jsonl(input_path_)
-    out = process_data(data, scorer_, retriever, max_word_count)
+    out = process_data(data, scorer_, retriever, max_word_count, chunk)
     write_jsonl(out, output_path_)
     print('save to ', output_path_)
 
@@ -81,6 +77,10 @@ if __name__ == '__main__':
     nohup python -u random_ncr.py --type train --max_word_count 1400 --output_dir ncr_random_1400 > logs/ncr_train.log 2>&1 &
     nohup python -u random_ncr.py --type dev --max_word_count 1400 --output_dir ncr_random_1400 > logs/ncr_dev.log 2>&1 &
     nohup python -u random_ncr.py --type test --max_word_count 1400 --output_dir ncr_random_1400 > logs/ncr_test.log 2>&1 &
+    
+    nohup python -u random_ncr.py --type train --max_word_count 1400 --output_dir ncr_chunk_1400 > logs/ncr_train.log 2>&1 &
+    nohup python -u random_ncr.py --type dev --max_word_count 1400 --output_dir ncr_chunk_1400 > logs/ncr_dev.log 2>&1 &
+    nohup python -u random_ncr.py --type test --max_word_count 1400 --output_dir ncr_chunk_1400 > logs/ncr_test.log 2>&1 &
     """
     PHASES = ["train", "dev", "test"]
 
@@ -108,4 +108,4 @@ if __name__ == '__main__':
         os.makedirs(output_base_path)
 
     process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retriever=Retriever,
-                 max_word_count=args.max_word_count - 100)
+                 max_word_count=args.max_word_count - 100, chunk=True)

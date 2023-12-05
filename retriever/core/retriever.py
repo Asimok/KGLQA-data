@@ -125,6 +125,20 @@ class BaseRetrieval:
         raw_context = [sent_idx["text"] for sent_idx in sent_data]
         return raw_context, chosen_sent_indices
 
+    def chunk(self, sent_data: list[dict], max_word_count: int):
+        # 按顺序选择句子
+        sentences = [sent['text'] for sent in sent_data]
+        chosen_sent_indices = set()
+        total_word_count = 0
+        for sent_idx, sent in enumerate(sentences):
+            if total_word_count < max_word_count:
+                total_word_count += sent_data[sent_idx]["word_count"]
+                chosen_sent_indices.add(sent_idx)
+        chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        chosen_sent_indices.sort()
+        raw_context = [sent_idx["text"] for sent_idx in sent_data]
+        return raw_context, chosen_sent_indices
+
 
 class Retrieval(BaseRetrieval):
     def __init__(self, scorer=None, tokenizer=None):
