@@ -108,4 +108,4 @@ if __name__ == '__main__':
         os.makedirs(output_base_path)
 
     process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retriever=Retriever,
-                 max_word_count=args.max_word_count - 100, chunk=True)
+                 max_word_count=args.max_word_count - 200, chunk=False)

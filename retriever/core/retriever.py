@@ -122,7 +122,7 @@ class BaseRetrieval:
                 chosen_sent_indices.add(sent_idx)
         chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
         chosen_sent_indices.sort()
-        raw_context = [sent_idx["text"] for sent_idx in sent_data]
+        raw_context = [sentences[sent_idx] for sent_idx in chosen_sent_indices]
         return raw_context, chosen_sent_indices
 
     def chunk(self, sent_data: list[dict], max_word_count: int):
@@ -136,7 +136,7 @@ class BaseRetrieval:
                 chosen_sent_indices.add(sent_idx)
         chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
         chosen_sent_indices.sort()
-        raw_context = [sent_idx["text"] for sent_idx in sent_data]
+        raw_context = [sentences[sent_idx] for sent_idx in chosen_sent_indices]
         return raw_context, chosen_sent_indices
 
 
