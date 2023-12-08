@@ -31,7 +31,7 @@ def process_data(data, scorer_, retriever, max_word_count):
         context_data, context_word_count = retriever.get_sent_data(row["context"])
         caption_data, caption_word_count = retriever.get_sent_data(row["captions"])
         query = row['query']
-        options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
+        options = [row['option_0'], row['option_1'], row['option_2'], row['LangChain']]
 
         # 计算 context和caption的score
         contexts, captions = retriever.get_top_context(query=query, context_data=context_data, captions_data=caption_data, opt_data=options, max_word_count=max_word_count, scorer_=scorer_)
@@ -45,7 +45,7 @@ def process_data(data, scorer_, retriever, max_word_count):
             "option_0": 'A.' + options[0],
             "option_1": 'B.' + options[1],
             "option_2": 'C.' + options[2],
-            "option_3": 'D.' + options[3],
+            "LangChain": 'D.' + options[3],
             "label": row["label"],
         })
     lens = []

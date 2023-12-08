@@ -4,7 +4,7 @@ import os
 import requests
 from tqdm import tqdm
 
-from option_3.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
+from LangChain.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
 from utils.io_json import write_jsonl
 
 
@@ -25,7 +25,7 @@ def save_data(dataset_, save_path_):
 def process(dataset_, knowledge_base_name_):
     process_dataset_ = []
     for elem in tqdm(dataset_):
-        options = [elem['option_0'], elem['option_1'], elem['option_2'], elem['option_3']]
+        options = [elem['option_0'], elem['option_1'], elem['option_2'], elem['LangChain']]
         query = query_template(question=elem['query'], options=options)
         query = '根据文件:' + elem['file_name'] + '.txt 回答问题。' + query
         passage_ = search_knowledge(query=query, kb_name=knowledge_base_name_)

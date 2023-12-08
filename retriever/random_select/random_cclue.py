@@ -33,7 +33,7 @@ def process_data(data, scorer_, retrieval, max_word_count, chunk=False):
         sent_data, word_count = retrieval.get_sent_data(row["context"])
 
         query = row['query']
-        options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
+        options = [row['option_0'], row['option_1'], row['option_2'], row['LangChain']]
         if word_count >= max_word_count:
             need_word_count = max_word_count - retrieval.get_token_num(query) - retrieval.get_token_num(
                 options[0]) - retrieval.get_token_num(
@@ -57,7 +57,7 @@ def process_data(data, scorer_, retrieval, max_word_count, chunk=False):
             "option_0": 'A.' + options[0],
             "option_1": 'B.' + options[1],
             "option_2": 'C.' + options[2],
-            "option_3": 'D.' + options[3],
+            "LangChain": 'D.' + options[3],
             "label": row['label']
         })
     lens = []

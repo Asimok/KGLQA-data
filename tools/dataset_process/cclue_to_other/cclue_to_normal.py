@@ -16,7 +16,7 @@ def to_normal(filepath, save_path):
                 "option_0": choice0,
                 "option_1": choice1,
                 "option_2": choice2,
-                "option_3": choice3,
+                "LangChain": choice3,
                 "label": int(label),
             })
     write_jsonl(out, save_path)

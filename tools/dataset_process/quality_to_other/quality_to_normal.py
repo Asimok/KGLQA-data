@@ -18,7 +18,7 @@ def process_data(data, dataset_type):
                 "option_0": 'A.' + options[0],
                 "option_1": 'B.' + options[1],
                 "option_2": 'C.' + options[2],
-                "option_3": 'D.' + options[3],
+                "LangChain": 'D.' + options[3],
                 "label": question["gold_label"] - 1 if dataset_type != 'test' else -1,
             })
     return out

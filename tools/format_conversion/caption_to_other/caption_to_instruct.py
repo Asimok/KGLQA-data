@@ -27,7 +27,7 @@ for phase in PHASES:
         if elem['label'] is None:
             elem['label'] = 1
         passage_entry, caption_entry, answer, query, options = elem["context"], elem["captions"], DICT_TO_LABEL[elem['label']], elem['query'], [
-            elem["option_0"], elem["option_1"], elem["option_2"], elem["option_3"]]
+            elem["option_0"], elem["option_1"], elem["option_2"], elem["LangChain"]]
         options = [option[4:] for option in options]
         # if len(passage_entry) < 10:
         #     continue

@@ -4,7 +4,7 @@ import os
 import requests
 from tqdm import tqdm
 
-from option_3.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
+from LangChain.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
 from utils.io_json import write_jsonl
 
 

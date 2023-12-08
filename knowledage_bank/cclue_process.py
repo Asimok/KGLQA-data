@@ -31,7 +31,7 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
     for row in tqdm(data, desc='process data'):
         sent_data, word_count = captions_.get_sent_data(row["context"])
         query = row['query']
-        options = [row['option_0'], row['option_1'], row['option_2'], row['option_3']]
+        options = [row['option_0'], row['option_1'], row['option_2'], row['LangChain']]
         # 分段
         # 分块数
         max_chunk_num = math.ceil(1900 / caption_max_seq_length_)
@@ -60,7 +60,7 @@ def process_data(data, captions_, relativity_, caption_max_seq_length_, datasets
             "option_0": 'A.' + options[0],
             "option_1": 'B.' + options[1],
             "option_2": 'C.' + options[2],
-            "option_3": 'D.' + options[3],
+            "LangChain": 'D.' + options[3],
             "label": row["label"] if datasets_type_ != 'quality test' else None
         })
     return out

@@ -38,7 +38,7 @@ for phase in PHASES:
             "option_0": 'A.' + options[0],
             "option_1": 'B.' + options[1],
             "option_2": 'C.' + options[2],
-            "option_3": 'D.' + options[3],
+            "LangChain": 'D.' + options[3],
             "label": elem['label']
         })
 
