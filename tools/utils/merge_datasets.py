@@ -6,8 +6,8 @@ from jsonlines import jsonlines
 # dataset_race_train = '/data0/maqi/KGLQA-data/datasets/RACE/race_train.jsonl'
 # dataset_race_dev = '/data0/maqi/KGLQA-data/datasets/race/race_dev.jsonl'
 
-dataset_quality = '/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel_new_instruct/train.jsonl'
-dataset_race_train = '/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption_and_rel_instruct/train.jsonl'
+dataset_quality = '/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_normal_caption/train.jsonl'
+dataset_race_train = '/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption/train.jsonl'
 # dataset_race_dev = '/data0/maqi/KGLQA-data/datasets/CCLUE_processed/cclue_firefly/dev.jsonl'
 # dataset_race_test = '/data0/maqi/KGLQA-data/datasets/CCLUE_processed/cclue_firefly/test.jsonl'
 
@@ -30,7 +30,7 @@ for i in range(5):
     random.shuffle(merge_data)
 
 # 保存
-save_path = '/data0/maqi/KGLQA-data/datasets/merge/ncr_and_cclue_caption_and_rel/train.jsonl'
+save_path = '/data0/maqi/KGLQA-data/datasets/merge/ncr_and_cclue_caption/train.jsonl'
 # 文件夹不存在 则创建
 if not os.path.exists(os.path.dirname(save_path)):
     os.makedirs(os.path.dirname(save_path))

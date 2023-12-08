@@ -8,16 +8,16 @@ from utils.io_json import write_jsonl
 
 LABEL_TO_ID_DICT = {"A": 0, "B": 1, "C": 2, "D": 3}
 DICT_TO_LABEL = {0: "A", 1: "B", 2: "C", 3: "D"}
-PHASES = ['dev', 'train', 'test']
+PHASES = ['train']
 LANGUAGES = 'zh'
-save_path = '/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption_and_rel_instruct'
+save_path = '/data0/maqi/KGLQA-data/datasets/merge/random_select/with_knowledge_without_select_instruction'
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 lens = []
 for phase in PHASES:
     raw_file = 'dev' if phase == 'validation' else phase
     dataset = []
-    input_file = f'/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption_and_rel/{phase}.jsonl'
+    input_file = f'/data0/maqi/KGLQA-data/datasets/merge/random_select/with_knowledge_without_select/{phase}.jsonl'
     # input_file = "/data0/maqi/KGLQA-data/datasets/RACE/race_caption_and_rel/all_train.jsonl"
     with open(input_file, 'r') as f:
         for line in f:
@@ -27,7 +27,7 @@ for phase in PHASES:
         if elem['label'] is None:
             elem['label'] = 1
         passage_entry, caption_entry, answer, query, options = elem["context"], elem["captions"], DICT_TO_LABEL[elem['label']], elem['query'], [
-            elem["option_0"], elem["option_1"], elem["option_2"], elem["LangChain"]]
+            elem["option_0"], elem["option_1"], elem["option_2"], elem["option_3"]]
         options = [option[4:] for option in options]
         # if len(passage_entry) < 10:
         #     continue

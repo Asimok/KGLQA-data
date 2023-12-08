@@ -10,6 +10,7 @@
       <list>
         <option value="$MODULE_DIR$/retriever/core" />
         <option value="$MODULE_DIR$/retriever" />
+        <option value="$MODULE_DIR$/LangChain" />
       </list>
     </option>
   </component>

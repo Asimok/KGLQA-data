@@ -25,7 +25,7 @@ def save_data(dataset_, save_path_):
 def process(dataset_, knowledge_base_name_):
     process_dataset_ = []
     for elem in tqdm(dataset_):
-        options = [elem['option_0'], elem['option_1'], elem['option_2'], elem['LangChain']]
+        options = [elem['option_0'], elem['option_1'], elem['option_2'], elem['option_3']]
         query = query_template(question=elem['query'], options=options)
         query = '根据文件:' + elem['file_name'] + '.txt 回答问题。' + query
         passage_ = search_knowledge(query=query, kb_name=knowledge_base_name_)

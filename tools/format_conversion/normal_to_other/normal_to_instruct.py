@@ -22,7 +22,7 @@ for phase in PHASES:
     out_data = []
     for idx, elem in enumerate(dataset):
         passage, answer, q, options = elem["context"], DICT_TO_LABEL[elem['label']], elem['query'], [
-            elem["option_0"], elem["option_1"], elem["option_2"], elem["LangChain"]]
+            elem["option_0"], elem["option_1"], elem["option_2"], elem["option_3"]]
         options = [option[4:] for option in options]
         if len(passage) < 10:
             continue

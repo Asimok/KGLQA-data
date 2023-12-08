@@ -1,3 +1,4 @@
+import random
 import re
 from collections import OrderedDict, defaultdict
 from typing import List
@@ -35,7 +36,9 @@ class KnowledgeBank(BaseRetrieval):
     def get_sent_data(self, raw_context):
         sent_data = []
         word_count = 0
-        for idx, sent_obj in enumerate(self.split_text_into_sentences(raw_context)):
+        if isinstance(raw_context, str):
+            raw_context = self.split_text_into_sentences(raw_context)
+        for idx, sent_obj in enumerate(raw_context):
             token_num = self.get_token_num(sent_obj)
             if token_num == 0:
                 continue
@@ -103,16 +106,10 @@ class KnowledgeBank(BaseRetrieval):
         context_score = self.get_top_sentences(query=query, sent_data=context_data, opt_data=opt_data)
 
         # 计算question,计算option 与 sentence 的score
-        # qp_scores_idx_context, op_scores_idx_context = self.get_sim(query=query, opt_data=opt_data, context_sents=context_sents)
         qp_scores_idx_captions, op_scores_idx_captions = self.get_sim(query=query, opt_data=opt_data, context_sents=captions_sents)
 
-        # sorted_scores_context = defaultdict(float)
         sorted_scores_context = context_score
         sorted_scores_captions = defaultdict(float)
-        # for idx, score_ in qp_scores_idx_context:
-        #     sorted_scores_context[f't_{idx}'] = max(sorted_scores_context.get(f't_{idx}', 0), score_)
-        # for idx, score_ in op_scores_idx_context:
-        #     sorted_scores_context[f't_{idx}'] = max(sorted_scores_context.get(f't_{idx}', 0), score_)
 
         for idx, score_ in qp_scores_idx_captions:
             sorted_scores_captions[f'c_{idx}'] = max(sorted_scores_captions.get(f'c_{idx}', 0), score_)
@@ -125,20 +122,56 @@ class KnowledgeBank(BaseRetrieval):
         # 按value排序
         sorted_scores_merge = sorted(sorted_scores_context.items(), key=lambda x: x[1], reverse=True)
         select_sorted_scores_merge = [sent_idx for sent_idx, score_ in sorted_scores_merge]
-        # TODO 如果 c_x 索引 在 t_x 之前，那么就删除 c_x
-        # select_sorted_scores_merge = set()
-        # for sent_idx, score_ in sorted_scores_merge:
-        #     if sent_idx.startswith('c_'):
-        #         if f't_{sent_idx[2:]}' in select_sorted_scores_merge:
-        #             continue
-        #     elif sent_idx.startswith('t_'):
-        #         if f'c_{sent_idx[2:]}' in select_sorted_scores_merge:
-        #             continue
-        #     select_sorted_scores_merge.add(sent_idx)
 
         # 组织上下文的逻辑
         # 排序从高到低
+        total_word_count = 0
+        chosen_sent_indices = set()
+        for sent_idx in select_sorted_scores_merge:
+            if sent_idx in chosen_sent_indices:
+                continue
+            if sent_idx.startswith('c_'):
+                sent_word_count = captions_data[int(sent_idx[2:])]["word_count"]
+            else:
+                sent_word_count = context_data[int(sent_idx[2:])]["word_count"]
+            if sent_idx not in chosen_sent_indices:
+                total_word_count += sent_word_count
+            if total_word_count > max_word_count:
+                break
+            if total_word_count > max_word_count:
+                break
+            chosen_sent_indices.add(sent_idx)
 
+        chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
+        # 排序
+        chosen_sent_indices.sort(key=lambda x: int(x[2:]))
+        captions = ''
+        contexts = ''
+        for sent_idx in chosen_sent_indices:
+            if sent_idx.startswith('c_'):
+                captions += captions_data[int(sent_idx[2:])]["text"]
+            else:
+                contexts += context_data[int(sent_idx[2:])]["text"]
+        return contexts, captions
+
+    def get_top_context_random(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
+        context_sents = [sent['text'] for sent in context_data]
+        # 合并context_sents
+        merge_context_sents = ''.join(context_sents)
+        context_data, word_count = self.get_sent_data(self.split_text_into_sentences(merge_context_sents))
+
+        # 随机生成排序
+        temp_context_data = []
+        for idx in range(len(context_data)):
+            temp_context_data.append(f't_{idx}')
+        temp_captions_data = []
+        for idx in range(len(captions_data)):
+            temp_captions_data.append(f'c_{idx}')
+        select_sorted_scores_merge = temp_context_data + temp_captions_data
+        random.shuffle(select_sorted_scores_merge)
+
+        # 组织上下文的逻辑
+        # 排序从高到低
         total_word_count = 0
         chosen_sent_indices = set()
         for sent_idx in select_sorted_scores_merge:

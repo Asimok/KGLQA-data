@@ -59,7 +59,7 @@ def process_data(data, scorer_, retrieval, max_word_count, datasets_type_='train
                 "option_0": 'A.' + options[0],
                 "option_1": 'B.' + options[1],
                 "option_2": 'C.' + options[2],
-                "LangChain": 'D.' + options[3],
+                "option_3": 'D.' + options[3],
                 "question_unique_id": question['question_unique_id'],
                 "label": question["gold_label"] if datasets_type_ != 'quality test' else None
             })
