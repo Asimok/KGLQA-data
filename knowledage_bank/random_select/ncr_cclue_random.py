@@ -2,7 +2,7 @@ import os
 import pathlib
 import sys
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 sys.path.append('/data0/maqi/KGLQA-data')
 from knowledage_bank.core.knowledge_bank import KnowledgeBank
 
@@ -105,14 +105,24 @@ if __name__ == '__main__':
     # 解析打印args
     print('args: ', args)
 
-    input_path = '/data0/maqi/KGLQA-data/datasets/merge/ncr_and_cclue_caption/train.jsonl'
-    output_path = f'/data0/maqi/KGLQA-data/datasets/merge/random_select/{args.output_dir}/train.jsonl'
-
     scorer = RocketScorer(model_name='zh_dureader_de', batch_size=64)
     Retriever = KnowledgeBank(scorer=scorer, tokenizer=tokenizer)
 
-    if not os.path.exists(pathlib.Path(output_path).parent):
-        os.makedirs(pathlib.Path(output_path).parent)
+    # input_path = '/data0/maqi/KGLQA-data/datasets/merge/ncr_and_cclue_caption/train.jsonl'
+    # output_path = f'/data0/maqi/KGLQA-data/datasets/merge/random_select/{args.output_dir}/train.jsonl'
 
-    process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retriever=Retriever,
-                 max_word_count=args.max_word_count - 100, select_knowledge=args.select_knowledge, select_mode=args.select_mode)
+    PHASE = ['train']
+    for phase in PHASE:
+        print(f"phase: {phase}")
+        # NCR
+        input_path = f'/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_normal_caption/{phase}.jsonl'
+        output_path = f'/data0/maqi/KGLQA-data/datasets/NCR/random_select/{args.output_dir}/{phase}.jsonl'
+        # CCLUE
+        # input_path = f'/data0/maqi/KGLQA-data/datasets/CCLUE/Caption/cclue_caption/{phase}.jsonl'
+        # output_path = f'/data0/maqi/KGLQA-data/datasets/CCLUE/random_select/{args.output_dir}/{phase}.jsonl'
+
+        if not os.path.exists(pathlib.Path(output_path).parent):
+            os.makedirs(pathlib.Path(output_path).parent)
+
+        process_file(input_path_=input_path, output_path_=output_path, scorer_=scorer, retriever=Retriever,
+                     max_word_count=args.max_word_count - 100, select_knowledge=args.select_knowledge, select_mode=args.select_mode)

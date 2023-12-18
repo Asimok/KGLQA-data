@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     scorer = RocketScorer(model_name='v2_nq_de', batch_size=512)
     Retriever = KnowledgeBank(scorer=scorer, tokenizer=tokenizer)
-    phase = 'train'
+    phase = 'dev'
     input_path = os.path.join(input_base_path, f"{phase}.jsonl")
     output_path = os.path.join(output_base_path, f"{phase}.jsonl")
     if not os.path.exists(output_base_path):
