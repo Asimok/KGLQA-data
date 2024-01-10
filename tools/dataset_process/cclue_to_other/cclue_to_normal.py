@@ -10,6 +10,8 @@ def to_normal(filepath, save_path):
         next(csv_reader)
         for id_, row in enumerate(csv_reader):
             _, question, _, context, label, choice0, choice1, choice2, choice3 = row
+            # if str(choice0).__contains__('苏逢吉'):
+            #     print(f'A#{choice0}\nB#{choice1}\nC#{choice2}\nD#{choice3}')
             out.append({
                 "context": context,
                 "query": question,
@@ -26,6 +28,6 @@ def to_normal(filepath, save_path):
 if __name__ == '__main__':
     PHASES = ["train", "dev", "test"]
     for phase in PHASES:
-        filepath = f'../../datasets/CCLUE/{phase}.csv'
+        filepath = f'/data0/maqi/KGLQA-data/datasets/CCLUE/CCLUE_raw/{phase}.csv'
         save_path = f'/data0/maqi/KGLTQA/datasets/CCLUE_processed/cclue_normal/{phase}.jsonl'
         to_normal(filepath, save_path)

@@ -90,6 +90,8 @@ class BaseRetrieval:
                 if sent_idx not in chosen_sent_indices:
                     total_word_count += sent_word_count
                 if total_word_count > max_word_count:
+                    if len(chosen_sent_indices) == 0:
+                        chosen_sent_indices.add(sent_idx)
                     break
                 chosen_sent_indices.add(sent_idx)
             if total_word_count > max_word_count:

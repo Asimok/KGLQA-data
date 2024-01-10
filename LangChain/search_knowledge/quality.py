@@ -1,10 +1,9 @@
 import json
 import os
 
-import requests
 from tqdm import tqdm
 
-from LangChain.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
+from LangChain.tools import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
 from utils.io_json import write_jsonl
 
 
@@ -33,7 +32,9 @@ def process(dataset_, knowledge_base_name_):
             prompt = instruction_template(passage_=passage_, question=question['question'], options=options)
             process_dataset_.append({
                 'prompt': prompt,
-                'label': DICT_TO_LABEL[question['gold_label'] - 1]
+                'question_unique_id': question['question_unique_id'],
+                # 'label': DICT_TO_LABEL[question['gold_label'] - 1]
+                'label': '-1'
             })
     return process_dataset_
 
@@ -41,7 +42,7 @@ def process(dataset_, knowledge_base_name_):
 if __name__ == '__main__':
     knowledge_base_name = 'QuALITY+RACE'
     # TODO gen test kb
-    PHASES = ['dev']
+    PHASES = ['test']
     for phase in PHASES:
         data_path = f'/data0/maqi/KGLQA-data/datasets/QuALITY/LangChain/knowledge_base/{phase}.jsonl'
         save_path = f'/data0/maqi/KGLQA-data/datasets/QuALITY/LangChain/select_quality_and_race'

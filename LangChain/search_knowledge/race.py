@@ -3,7 +3,7 @@ import os
 
 from tqdm import tqdm
 
-from LangChain.utils import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
+from LangChain.tools import query_template, search_knowledge, instruction_template, DICT_TO_LABEL
 from utils.io_json import write_jsonl
 
 

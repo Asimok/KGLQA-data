@@ -17,7 +17,7 @@ class Captions:
         self.url = url
         self.max_seq_length = max_seq_length
         self.language = language
-        self.split_token = '<question>:\n'
+        self.split_token = '<问题>:\n'
 
     def get_token_num(self, text):
         token = self.tokenizer.encode(text=text, add_special_tokens=False)

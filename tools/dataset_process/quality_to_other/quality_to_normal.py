@@ -7,11 +7,15 @@ from utils.io_json import read_jsonl, write_jsonl
 
 def process_data(data, dataset_type):
     out = []
+    i = 0
     for row in tqdm(data):
         context = row["article"]
+        i += 1
         for question in row['questions']:
             query = question['question']
             options = question['options']
+            # if i == 120:
+            #     print(f'A#{options[0]}B#{options[1]}C#{options[2]}D#{options[3]}')
             out.append({
                 "context": context,
                 "query": query,
@@ -21,6 +25,7 @@ def process_data(data, dataset_type):
                 "option_3": 'D.' + options[3],
                 "label": question["gold_label"] - 1 if dataset_type != 'test' else -1,
             })
+            #
     return out
 
 
@@ -34,7 +39,7 @@ def process_file(input_path_, output_path_, dataset_type):
 if __name__ == '__main__':
     PHASES = ["train", "dev", "test"]
 
-    input_base_path = '/data0/maqi/KGLQA-data/datasets/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped'
+    input_base_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/QuALITY.v1.0.1/QuALITY.v1.0.1.htmlstripped'
     output_base_path = f'/data0/maqi/KGLQA-data/datasets/quality_process/quality_normal_format'
     for phase in PHASES:
         input_path = f"{input_base_path}.{phase}"

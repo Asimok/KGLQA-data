@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 import re
 
-from LangChain.utils import clean_str, gen_file_name
+from LangChain.tools import clean_str, gen_file_name
 from utils.io_json import write_jsonl
 
 
