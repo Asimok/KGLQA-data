@@ -2,11 +2,12 @@ import sys
 
 sys.path.append('/data0/maqi/KGLQA-data')
 
+from knowledage_bank.core.config import Caption_Server
 from knowledage_bank.core.knowledge_bank import KnowledgeBank
 from knowledage_bank.core.captions import Captions
-from transformers import AutoTokenizer, LlamaTokenizer
+from transformers import LlamaTokenizer
 
-from retriever.core.retriever import RocketScorer, Retrieval
+from retriever.core.retriever import RocketScorer
 import flask
 import math
 
@@ -70,7 +71,7 @@ def get_caption_and_rel(retriever, scorer_, query, options, context_data, captio
 if __name__ == '__main__':
     app = flask.Flask(__name__)
     scorer_zh, Retriever_zh = knowledge_bank_zh()
-    captions_zh = Captions(url="http://219.216.64.75:7036/get_captions", tokenizer=tokenizer_zh, language='zh', max_seq_length=200)
+    captions_zh = Captions(url=f"{Caption_Server}:7036/get_captions", tokenizer=tokenizer_zh, language='zh', max_seq_length=200)
 
 
     @app.route("/knowledge_bank_zh", methods=["POST"])

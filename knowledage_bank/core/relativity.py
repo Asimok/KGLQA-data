@@ -3,12 +3,13 @@ from typing import List
 
 import requests
 
+from knowledage_bank.core.config import Caption_Server
 from knowledage_bank.core.prompt import mark_relativity
 
 
 class Relativity:
     def __init__(self, language='en', max_seq_length=5):
-        self.url = "http://219.216.64.231:7036/get_captions"
+        self.url = f"{Caption_Server}:7036/get_captions"
         self.max_seq_length = max_seq_length
         self.language = language
         self.split_token = '<question>:\n'

@@ -56,7 +56,6 @@ if __name__ == '__main__':
         print()
 
 
-    # test()
     @app.route("/key_sentence_zh", methods=["POST"])
     def key_sentence_zh_api():
         params = flask.request.get_json()
