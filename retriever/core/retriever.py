@@ -150,7 +150,7 @@ class Retrieval(BaseRetrieval):
 
     def split_text_into_sentences(self, text):
         # 使用正则表达式将文本按照句子分隔进行拆分
-        sentences_ = re.split(r'[ 。！？；;\n]', text)
+        sentences_ = re.split(r'[ .。！!?？；;\n]', text)
 
         # 去除空白句子
         sentences_ = [s.strip() for s in sentences_ if s.strip()]
