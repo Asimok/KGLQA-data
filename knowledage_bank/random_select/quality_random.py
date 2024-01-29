@@ -90,7 +90,7 @@ if __name__ == '__main__':
     nohup python -u quality_random.py --max_word_count 2048 --select_mode select --output_dir without_knowledge_select  > logs/quality_without_knowledge_select.log 2>&1 &
     nohup python -u quality_random.py --max_word_count 2048 --select_mode chunk --output_dir without_knowledge_chunk  > logs/quality_without_knowledge_chunk.log 2>&1 &
     nohup python -u quality_random.py --max_word_count 2048 --select_mode random --output_dir without_knowledge_random  > logs/quality_without_knowledge_random.log 2>&1 &
-    nohup python -u quality_random.py --max_word_count 2048 --select_knowledge True --select_mode random --output_dir with_knowledge_without_select > logs/quality_without_knowledge_random.log 2>&1 &
+    nohup python -u quality_random.py --max_word_count 2048 --select_knowledge True --select_mode random --output_dir with_knowledge_without_select > logs/quality_with_knowledge_without_select.log 2>&1 &
     """
     parser = argparse.ArgumentParser(description="rocket_qa preprocessing")
 
@@ -104,13 +104,15 @@ if __name__ == '__main__':
                         help="output_dir")
     args = parser.parse_args()
     # 解析打印args
+    print('*' * 70)
     print('args: ', args)
+    print('*' * 70)
     input_base_path = '/data0/maqi/KGLQA-data/datasets/QuALITY/Caption/quality_normal_caption'
     output_base_path = f'/data0/maqi/KGLQA-data/datasets/QuALITY/random_select/{args.output_dir}'
 
     scorer = RocketScorer(model_name='v2_nq_de', batch_size=512)
     Retriever = KnowledgeBank(scorer=scorer, tokenizer=tokenizer)
-    phase = 'dev'
+    phase = 'test'
     input_path = os.path.join(input_base_path, f"{phase}.jsonl")
     output_path = os.path.join(output_base_path, f"{phase}.jsonl")
     if not os.path.exists(output_base_path):

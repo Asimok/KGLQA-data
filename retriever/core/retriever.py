@@ -148,9 +148,12 @@ class Retrieval(BaseRetrieval):
     def __init__(self, scorer=None, tokenizer=None):
         super().__init__(scorer, tokenizer)
 
-    def split_text_into_sentences(self, text):
+    def split_text_into_sentences(self, text, language='zh'):
         # 使用正则表达式将文本按照句子分隔进行拆分
-        sentences_ = re.split(r'[ .。！!?？；;\n]', text)
+        if language == 'zh':
+            sentences_ = re.split(r'[ .。！!?？；;\n]', text)
+        else:
+            sentences_ = re.split(r'[.。！!?？；;\n]', text)
 
         # 去除空白句子
         sentences_ = [s.strip() for s in sentences_ if s.strip()]
@@ -166,10 +169,10 @@ class Retrieval(BaseRetrieval):
 
         return merged_sentences
 
-    def get_sent_data(self, raw_text):
+    def get_sent_data(self, raw_text, language='zh'):
         sent_data = []
         word_count = 0
-        for idx, sent_obj in enumerate(self.split_text_into_sentences(raw_text)):
+        for idx, sent_obj in enumerate(self.split_text_into_sentences(raw_text, language=language)):
             token_num = self.get_token_num(sent_obj)
             sent_data.append({
                 "text": str(sent_obj).strip(),

@@ -26,8 +26,8 @@ def key_sentence_en():
     return scorer, Retriever
 
 
-def get_key_sentence(retrieval, scorer, query, options, context, max_word_count=1536):
-    sent_data, word_count = retrieval.get_sent_data(context)
+def get_key_sentence(retrieval, scorer, query, options, context, max_word_count=1536, language='zh'):
+    sent_data, word_count = retrieval.get_sent_data(context, language=language)
 
     raw_context, select_idx = retrieval.get_top_sentences_mark(
         query=query,
@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 options = split_token + temp[1]
         if len(temp) > 1:
             deal_options.append(split_token + temp[1])
-        raw_context, select_idx = get_key_sentence(Retriever_en, scorer_en, query, deal_options, context, max_word_count)
+        raw_context, select_idx = get_key_sentence(Retriever_en, scorer_en, query, deal_options, context, max_word_count, language='en')
         # print(raw_context, select_idx)
         return flask.jsonify({"context": raw_context, "select_idx": select_idx})
 
