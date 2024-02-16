@@ -1,3 +1,6 @@
+"""
+知识所占比例
+"""
 import json
 import os
 import torch
@@ -36,16 +39,13 @@ def statistics(dataset_path_):
                 # train_data.append(json.loads(line)['conversation'][0]['human'])
                 train_data.append(json.loads(line))
 
-    word_count = []
+    captions_count = []
+    context_count = []
     for row in tqdm(train_data):
-        word_count.append(get_token_num(str(row)))
-    print("样本数量：", len(word_count))
-    print("平均token数量：", sum(word_count) / len(word_count))
-    pd_data = pd.Series(word_count).describe(percentiles=[0.75, 0.9, 0.95])
-    k = ['样本数量', '平均token数量', '标准差', '最小值', '75分位', '90分位', '95分位', '最大值']
-    v = [len(word_count), sum(word_count) / len(word_count), pd_data['std'], pd_data['min'], pd_data['75%'], pd_data['90%'], pd_data['95%'], pd_data['max']]
-    v = [round(i, 1) for i in v]
-    return k, v
+        captions_count.append(get_token_num(str(row['captions'])))
+        context_count.append(get_token_num(str(row['context'])))
+
+    return sum(captions_count) / len(captions_count), sum(context_count) / len(context_count)
 
 
 def get_token_num(text):
@@ -55,26 +55,16 @@ def get_token_num(text):
 
 if __name__ == '__main__':
 
-    # prefix = ('Read the following passage and questions, then choose the right answer from options, the answer '
-    #           'should be one of A, B, C, D.\n\n')
-    # passage = f'<passage>:\n\n\n'
-    # question = f'<question>:\n\n\n'
-    # option = f'<options>:\nA \nB \nC \nD \n\n'
-    # suffix = f"<answer>:\n"
-    # prompt = ''.join([prefix, passage, question, option, suffix])
-
-    phases = ['train','dev','test']
+    phases = ['train', 'dev', 'test']
     df = pd.DataFrame()
     dataset_name = None
     for phase in phases:
         # dataset_path = f"/data0/maqi/KGLQA-data/datasets/NCR/ncr_rocketqa_1400/{phase}.jsonl"
-        dataset_path = f'/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel/{phase}.jsonl'
+        dataset_path = f'/data0/maqi/KGLQA-data/datasets/RACE/Caption/race_caption_and_rel/all_{phase}.jsonl'
         dataset_name = dataset_path.split('/')[-2]
         if not os.path.exists('tmp'):
             os.makedirs('tmp')
-        stat_k, stat_v = statistics(dataset_path)
-        df[f'{phase}_k'] = stat_k
-        df[f'{phase}_v'] = stat_v
-    df.to_csv(f'tmp/{dataset_name}_caption_stat.csv', index=False)
-    print('save to: ', f'tmp/{dataset_name}_caption_stat.csv')
+        caption_k, context_v = statistics(dataset_path)
+        print(f'{phase} caption token count: {caption_k}')
+        print(f'{phase} context token count: {context_v}')
     print('done')

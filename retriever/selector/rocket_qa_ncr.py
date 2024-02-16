@@ -78,6 +78,13 @@ if __name__ == '__main__':
     nohup python -u rocket_qa_ncr.py --type train --max_word_count 1400 --output_dir ncr_rocketqa_1400 > logs/ncr_train.log 2>&1 &
     nohup python -u rocket_qa_ncr.py --type dev --max_word_count 1400 --output_dir ncr_rocketqa_1400 > logs/ncr_dev.log 2>&1 &
     nohup python -u rocket_qa_ncr.py --type test --max_word_count 1400 --output_dir ncr_rocketqa_1400 > logs/ncr_test.log 2>&1 &
+    
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 400 --output_dir len_analyze > logs/ncr_test_400.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 600 --output_dir len_analyze > logs/ncr_test_600.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 800 --output_dir len_analyze > logs/ncr_test_800.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 1000 --output_dir len_analyze > logs/ncr_test_1000.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 1200 --output_dir len_analyze > logs/ncr_test_1200.log 2>&1 &
+    nohup python -u rocket_qa_ncr.py --type test --max_word_count 1600 --output_dir len_analyze > logs/ncr_test_1600.log 2>&1 &
     """
     PHASES = ["train", "dev", "test"]
 
@@ -100,7 +107,7 @@ if __name__ == '__main__':
     Retriever = Retrieval(scorer=scorer, tokenizer=tokenizer)
 
     input_path = os.path.join(input_base_path, f"{phase}.jsonl")
-    output_path = os.path.join(output_base_path, f"{phase}.jsonl")
+    output_path = os.path.join(output_base_path, f"{phase}_{args.max_word_count}.jsonl")
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
 
