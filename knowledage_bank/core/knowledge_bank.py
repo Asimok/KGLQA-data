@@ -96,7 +96,7 @@ class KnowledgeBank(BaseRetrieval):
 
         return max_score_dict
 
-    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
+    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer, proportion=None):
         context_sents = [sent['text'] for sent in context_data]
         captions_sents = [sent['text'] for sent in captions_data]
 
@@ -126,21 +126,54 @@ class KnowledgeBank(BaseRetrieval):
         # 组织上下文的逻辑
         # 排序从高到低
         total_word_count = 0
-        chosen_sent_indices = set()
-        for sent_idx in select_sorted_scores_merge:
-            if sent_idx in chosen_sent_indices:
-                continue
-            if sent_idx.startswith('c_'):
-                sent_word_count = captions_data[int(sent_idx[2:])]["word_count"]
-            else:
-                sent_word_count = context_data[int(sent_idx[2:])]["word_count"]
-            if sent_idx not in chosen_sent_indices:
-                total_word_count += sent_word_count
-            if total_word_count > max_word_count:
-                break
-            if total_word_count > max_word_count:
-                break
-            chosen_sent_indices.add(sent_idx)
+        if proportion is None:
+            chosen_sent_indices = set()
+            for sent_idx in select_sorted_scores_merge:
+                if sent_idx in chosen_sent_indices:
+                    continue
+                if sent_idx.startswith('c_'):
+                    sent_word_count = captions_data[int(sent_idx[2:])]["word_count"]
+                else:
+                    sent_word_count = context_data[int(sent_idx[2:])]["word_count"]
+                if sent_idx not in chosen_sent_indices:
+                    total_word_count += sent_word_count
+                if total_word_count > max_word_count:
+                    break
+                if total_word_count > max_word_count:
+                    break
+                chosen_sent_indices.add(sent_idx)
+        else:
+            # 按比例选择
+            captions_word_count = max_word_count * proportion
+            context_word_count = max_word_count - captions_word_count
+            chosen_sent_indices = set()
+            for sent_idx in select_sorted_scores_merge:
+                if sent_idx in chosen_sent_indices:
+                    continue
+                if sent_idx.startswith('c_'):
+                    sent_word_count = captions_data[int(sent_idx[2:])]["word_count"]
+                    if sent_idx not in chosen_sent_indices:
+                        if captions_word_count - sent_word_count > 0:
+                            total_word_count += sent_word_count
+                            captions_word_count -= sent_word_count
+                            chosen_sent_indices.add(sent_idx)
+
+                if total_word_count > max_word_count:
+                    break
+            for sent_idx in select_sorted_scores_merge:
+                if total_word_count > max_word_count:
+                    break
+                if sent_idx in chosen_sent_indices:
+                    continue
+                if sent_idx.startswith('t_'):
+                    sent_word_count = context_data[int(sent_idx[2:])]["word_count"]
+                    if sent_idx not in chosen_sent_indices:
+                        if context_word_count - sent_word_count > 0:
+                            total_word_count += sent_word_count
+                            context_word_count -= sent_word_count
+                            chosen_sent_indices.add(sent_idx)
+                if total_word_count > max_word_count:
+                    break
 
         chosen_sent_indices = list(OrderedDict.fromkeys(chosen_sent_indices))
         # 排序

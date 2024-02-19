@@ -44,7 +44,7 @@ class BaseRetrieval:
                           scorer_: RocketScorer):
         pass
 
-    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer):
+    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer,proportion=None):
         pass
 
     def get_top_sentences_mark(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,

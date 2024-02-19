@@ -55,16 +55,16 @@ def get_token_num(text):
 
 if __name__ == '__main__':
 
-    phases = ['train', 'dev', 'test']
+    phases = ['dev', 'test']
     df = pd.DataFrame()
     dataset_name = None
     for phase in phases:
         # dataset_path = f"/data0/maqi/KGLQA-data/datasets/NCR/ncr_rocketqa_1400/{phase}.jsonl"
-        dataset_path = f'/data0/maqi/KGLQA-data/datasets/RACE/Caption/race_caption_and_rel/all_{phase}.jsonl'
+        dataset_path = f'/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel/{phase}.jsonl'
         dataset_name = dataset_path.split('/')[-2]
         if not os.path.exists('tmp'):
             os.makedirs('tmp')
         caption_k, context_v = statistics(dataset_path)
-        print(f'{phase} caption token count: {caption_k}')
-        print(f'{phase} context token count: {context_v}')
+        print(f'{phase} caption token count: {int(caption_k)}')
+        print(f'{phase} context token count: {int(context_v)}')
     print('done')
