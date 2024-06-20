@@ -21,7 +21,7 @@ tokenizer_en = load_tokenizer_en()
 
 
 def key_sentence_en():
-    scorer = RocketScorer(model_name='v2_nq_de', batch_size=64)
+    scorer = RocketScorer(model_name='v2_nq_de', batch_size=64,device='cpu')
     Retriever = Retrieval(scorer=scorer, tokenizer=tokenizer_en)
     return scorer, Retriever
 

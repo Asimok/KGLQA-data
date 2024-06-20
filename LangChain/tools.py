@@ -48,13 +48,13 @@ def query_template(question, options):
     return prompt
 
 
-def search_knowledge(query, kb_name, top_k=5, score_threshold=1):
+def search_knowledge(query, kb_name, top_k=5, score_threshold=0.3):
     url = "http://219.216.64.231:7861/knowledge_base/search_docs"
     data = {
         "query": query,
         "knowledge_base_name": kb_name,
         "top_k": top_k,
-        "score_threshold": score_threshold
+        "score_threshold": 1 - score_threshold
     }
     # 超时时间设为60s
     response = requests.post(url, json=data, timeout=60)
@@ -62,11 +62,35 @@ def search_knowledge(query, kb_name, top_k=5, score_threshold=1):
     # 排序
     score_dict = {}
     for i in range(len(result_)):
-        score_dict[result_[i]['score']] = result_[i]['page_content']
+        try:
+            score_dict[result_[i]['score']] = result_[i]['page_content']
+        except Exception as e:
+            print(e)
     # 按key排序
     score_dict = sorted(score_dict.items(), key=lambda x: x[0], reverse=True)
     passage_ = ''
+
     for i in range(len(score_dict)):
-        if score_dict[i][0] > 0.5:
-            passage_ += score_dict[i][1] + '\n'
+        passage_ += score_dict[i][1] + '\n'
+
     return passage_
+
+
+if __name__ == '__main__':
+    # query_ = 'What would have happened if the Centaurus Expedition hadn’t failed?'
+    # options_ = ["People from Earth would have colonized the Procyon system.",
+    #             "Captain Llud would have become a hero.",
+    #             "The other two Quest ships would have been launched.",
+    #             "Humanity would have died out."
+    #             ]
+    query_ = "下列材料相关内容的概括和分析，不正确的一项是"
+    options_ = ['幼年的高锟热衷化学实验，后来又迷恋无线电，这段经历表现出的特质对他后来进行光纤通信研究具有重要的作用。',
+                '高锟先生为人谦虚，对人和蔼，关心家人，用实际行动支持学生自由发表言论，表现了一位科学家的高尚美德。',
+                '文章引用高锟的妻子黄美芸和网友的话，突出了高锟在光纤通信科研领域的重大贡献，表达了对高锟的崇敬之情。',
+                '这篇传记记述了传主高锟人生中的一些典型事件， 通过正面和侧面描写来表现传主，生动形象，真实感人。']
+    """
+    下列材料相关内容的概括和分析，不正确的一项是？A# 幼年的高锟热衷化学实验，后来又迷恋无线电，这段经历表现出的特质对他后来进行光纤通信研究具有重要的作用。B#高锟先生为人谦虚，对人和蔼，关心家人，用实际行动支持学生自由发表言论，表现了一位科学家的高尚美德。C#文章引用高锟的妻子黄美芸和网友的话，突出了高锟在光纤通信科研领域的重大贡献，表达了对高锟的崇敬之情。D#这篇传记记述了传主高锟人生中的一些典型事件， 通过正面和侧面描写来表现传主，生动形象，真实感人。
+    """
+    prompt = query_template(question=query_, options=options_)
+    passage_ = search_knowledge(query=prompt, kb_name='QuALITY', top_k=10, score_threshold=0)
+    print('')

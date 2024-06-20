@@ -37,7 +37,7 @@ def process(dataset_, knowledge_base_name_):
 
 
 if __name__ == '__main__':
-    knowledge_base_name = 'QuALITY+RACE'
+    knowledge_base_name = 'RACE'
     PHASES = ['test']
     for phase in PHASES:
         for dataset_type in ['middle', 'high']:

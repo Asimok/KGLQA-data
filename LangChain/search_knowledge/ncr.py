@@ -22,14 +22,15 @@ def save_data(dataset_, save_path_):
     print(f'save to {save_path_}')
 
 
-def process(dataset_, knowledge_base_name_):
+def process(dataset_, knowledge_base_name_, top_k=5, score_threshold=0.3):
     process_dataset_ = []
     for elem in tqdm(dataset_):
         for question in elem['questions']:
             options = [option[2:] for option in question['options']]
             query = query_template(question=question['question'], options=options)
             query = '根据文件:' + elem['file_name'] + '.txt 回答问题。' + query
-            passage_ = search_knowledge(query=query, kb_name=knowledge_base_name_)
+            passage_ = search_knowledge(query=query, kb_name=knowledge_base_name_, top_k=top_k,
+                                        score_threshold=score_threshold)
             prompt = instruction_template(passage_=passage_, question=question['question'], options=options)
             process_dataset_.append({
                 'prompt': prompt,
@@ -40,13 +41,17 @@ def process(dataset_, knowledge_base_name_):
 
 if __name__ == '__main__':
     knowledge_base_name = 'NCR'
-    PHASES = ['dev', 'test']
-    for phase in PHASES:
-        data_path = f'/data0/maqi/KGLQA-data/datasets/NCR/LangChain/knowledge_base/{phase}.jsonl'
-        save_path = f'/data0/maqi/KGLQA-data/datasets/NCR/LangChain/select/{phase}.jsonl'
-        # 文件夹不存在 则新建
-        if not os.path.exists(os.path.dirname(save_path)):
-            os.makedirs(save_path)
-        dataset = read_ncr(data_path)
-        process_dataset = process(dataset, knowledge_base_name_=knowledge_base_name)
-        save_data(dataset_=process_dataset, save_path_=save_path)
+    # score_thresholds = [0, 0.1, 0.2, 0.4]
+    score_thresholds = [0]
+    for score_threshold in score_thresholds:
+        PHASES = ['test']
+        for phase in PHASES:
+            data_path = f'/data0/maqi/KGLQA-data/datasets/NCR/LangChain/knowledge_base/{phase}.jsonl'
+            save_path = f'/data0/maqi/KGLQA-data/datasets/NCR/LangChain/select/score_threshold/'
+            # 文件夹不存在 则新建
+            if not os.path.exists(os.path.dirname(save_path)):
+                os.makedirs(save_path)
+            dataset = read_ncr(data_path)
+            process_dataset = process(dataset, knowledge_base_name_=knowledge_base_name, top_k=20, score_threshold=score_threshold)
+            save_data(dataset_=process_dataset, save_path_=save_path + f'{phase}_{score_threshold}.jsonl')
+            print(f'score_threshold: {score_threshold} save to {save_path}')

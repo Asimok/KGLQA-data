@@ -63,18 +63,20 @@ if __name__ == '__main__':
     # suffix = f"<answer>:\n"
     # prompt = ''.join([prefix, passage, question, option, suffix])
 
-    phases = ['train','dev','test']
+    phases = ['high', 'middle']
     df = pd.DataFrame()
     dataset_name = None
     for phase in phases:
         # dataset_path = f"/data0/maqi/KGLQA-data/datasets/NCR/ncr_rocketqa_1400/{phase}.jsonl"
-        dataset_path = f'/data0/maqi/KGLQA-data/datasets/NCR/Caption/ncr_caption_and_rel/{phase}.jsonl'
-        dataset_name = dataset_path.split('/')[-2]
+
+        dataset_path = f'/data0/maqi/KGLQA-data/datasets/RACE/Caption/race_caption_and_rel/{phase}_train.jsonl'
+        # dataset_name = dataset_path.split('/')[-4]
+        dataset_name = f'middle_{phase}'
         if not os.path.exists('tmp'):
             os.makedirs('tmp')
         stat_k, stat_v = statistics(dataset_path)
         df[f'{phase}_k'] = stat_k
         df[f'{phase}_v'] = stat_v
-    df.to_csv(f'tmp/{dataset_name}_caption_stat.csv', index=False)
-    print('save to: ', f'tmp/{dataset_name}_caption_stat.csv')
+    df.to_csv(f'tmp/{dataset_name}_kb_stat.csv', index=False)
+    print('save to: ', f'tmp/{dataset_name}_kb_stat.csv')
     print('done')

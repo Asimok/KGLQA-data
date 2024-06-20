@@ -15,7 +15,9 @@ class RocketScorer:
                  ):
         if device is None:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        use_cuda = True if device.type == 'cuda' else False
+        use_cuda = True if device == 'cuda' else False
+        print('use cuda', use_cuda)
+        print('device', device)
         self.dual_encoder = rocketqa.load_model(model=model_name, use_cuda=use_cuda, batch_size=batch_size)
 
     def score(self, query: str, para_list: list):
@@ -44,7 +46,7 @@ class BaseRetrieval:
                           scorer_: RocketScorer):
         pass
 
-    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer,proportion=None):
+    def get_top_context(self, query: str, context_data: list[dict], captions_data: list[dict], opt_data: list, max_word_count: int, scorer_: RocketScorer, proportion=None):
         pass
 
     def get_top_sentences_mark(self, query: str, sent_data: list[dict], opt_data: list, max_word_count: int,
